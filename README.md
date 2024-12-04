@@ -1,4 +1,4 @@
-# siebenuhr_core
+# SiebenuhrCore Library
 
 The `siebenuhr_core` library is the heart of the Siebenuhr LED clock. It provides reusable and maintainable components for driving the clock's functionality. This library is designed to support integration with Home Assistant via ESPHome as well as standalone firmware for users without a Home Assistant setup.
 
@@ -19,7 +19,6 @@ This repository is a work in progress. Additional documentation and usage exampl
 siebenuhr_core/
 ├── include/          # Public header files
 ├── src/              # Core source files
-├── tests/            # Unit tests (to be added)
 └── library.json      # PlatformIO library metadata
 ```
 
@@ -65,4 +64,4 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 - Detailed usage examples
 - API documentation
 - Testing guidelines
-```
+
