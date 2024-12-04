@@ -1,0 +1,22 @@
+{
+    "name": "siebenuhr_core",
+    "version": "1.0.0",
+    "description": "Core functionality for the siebenuhr clock",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/soliddifference/siebenuhr_core.git"
+    },
+    "authors": [
+      {
+        "name": "Thomas Gresch",
+        "email": ""
+      },
+      {
+        "name": "Yannick Suter",
+        "email": "yannick.suter@gmail.com"
+      }
+    ],
+    "license": "MIT",
+    "frameworks": ["arduino"],
+    "platforms": ["espressif32"]
+  }
