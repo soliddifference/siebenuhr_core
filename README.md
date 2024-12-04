@@ -19,7 +19,6 @@ This repository is a work in progress. Additional documentation and usage exampl
 siebenuhr_core/
 ├── include/          # Public header files
 ├── src/              # Core source files
-├── examples/         # Example usage (to be added)
 ├── tests/            # Unit tests (to be added)
 └── library.json      # PlatformIO library metadata
 ```
