@@ -37,7 +37,7 @@ Add the following to your `platformio.ini`:
 
 ```ini
 lib_deps =
-    https://github.com/<your-username>/siebenuhr_core.git
+    https://github.com/soliddifference/siebenuhr_core.git
 ```
 
 ### With ESPHome
@@ -48,7 +48,7 @@ Include the library via `external_components` in your ESPHome configuration:
 external_components:
   - source:
       type: git
-      url: https://github.com/<your-username>/siebenuhr_core.git
+      url: https://github.com/soliddifference/siebenuhr_core.git
       ref: main
 ```
 
