@@ -1,6 +1,6 @@
 #pragma once
 
-namespace siebenuhr 
+namespace siebenuhr::core
 {
     class Controller 
     {

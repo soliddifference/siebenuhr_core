@@ -1,6 +1,6 @@
-#include "controller.h"
+#include "siebenuhr/controller.h"
 
-namespace siebenuhr 
+namespace siebenuhr::core
 {
     void Controller::initialize() 
     {
