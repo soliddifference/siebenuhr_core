@@ -1,6 +1,6 @@
-#include "siebenuhr/controller.h"
+#include "siebenuhr_controller.h"
 
-namespace siebenuhr::core
+namespace siebenuhr_core
 {
     Controller* Controller::s_instance = nullptr;
 
