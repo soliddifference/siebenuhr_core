@@ -8,12 +8,8 @@
     },
     "authors": [
       {
-        "name": "Thomas Gresch",
-        "email": ""
-      },
-      {
-        "name": "Yannick Suter",
-        "email": "yannick.suter@gmail.com"
+        "name": "Solid Difference Team",
+        "maintainer": true
       }
     ],
     "license": "MIT",
