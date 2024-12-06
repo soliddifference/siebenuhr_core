@@ -6,4 +6,9 @@ namespace siebenuhr::core
     {
         // just some basic code to test the library integration
     }
+
+    void Controller::update() 
+    {
+        // just some basic code to test the library integration
+    }
 }
