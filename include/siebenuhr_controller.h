@@ -7,6 +7,8 @@ namespace siebenuhr_core
     public:
     	static Controller* getInstance();
 
+        void setInterval(int interval);
+
         void initialize();
         void update();
 

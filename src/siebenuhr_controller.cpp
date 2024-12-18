@@ -25,6 +25,11 @@ namespace siebenuhr_core
         pinMode(LED_PIN, OUTPUT);
     }
 
+    void Controller::setInterval(int interval) 
+    {
+        m_interval = interval;
+    }
+
     void Controller::update() 
     {
         unsigned long currentMillis = millis();
