@@ -1,8 +1,6 @@
 #include "siebenuhr_controller.h"
 #include <Arduino.h>
 
-// const int LED_PIN = 2;
-
 namespace siebenuhr_core
 {
     Controller* Controller::s_instance = nullptr;
@@ -22,7 +20,7 @@ namespace siebenuhr_core
         m_interval = 500;
         m_ledState = false;
 
-        pinMode(LED_PIN, OUTPUT);
+        pinMode(m_ledPin, OUTPUT);
     }
 
     void Controller::setInterval(int interval) 
