@@ -50,6 +50,17 @@ external_components:
       ref: main
 ```
 
+### Local Repository (Dev Mode)
+
+To work with a local version of the library during development, reference the library using a file:// path instead of a GitHub URL. This allows for faster compile and testing without requiring Git commits.
+
+```ini
+lib_deps =
+  file://C:\local\path\to\the\core_package\dir\siebenuhr_core
+```
+
+Replace the path above with the location of your locally checked-out repository.
+
 ## Contributing
 
 Contributions are welcome! Please fork this repository and submit a pull request with your changes.
