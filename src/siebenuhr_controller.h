@@ -1,5 +1,7 @@
 #pragma once
 
+#include "siebenuhr_display.h"
+
 namespace siebenuhr_core
 {
     class Controller 
@@ -10,7 +12,7 @@ namespace siebenuhr_core
         void setInterval(int interval);
         void setLEDPin(int pin);
 
-        void initialize();
+        void initialize(int clock_type);
         void update();
 
     private:
@@ -18,6 +20,9 @@ namespace siebenuhr_core
 
     	static Controller* s_instance;
 
+       	Display* m_display;
+
+        // heartbeat
         int m_ledPin;
         unsigned long m_previousMillis;
         unsigned long m_interval;
