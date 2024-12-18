@@ -28,7 +28,7 @@ namespace siebenuhr_core
     void Controller::update() 
     {
         unsigned long currentMillis = millis();
-        if (currentMillis - m_previousMillis >= interval) {
+        if (currentMillis - m_previousMillis >= m_interval) {
             m_previousMillis = currentMillis;
             m_ledState = !m_ledState;
             digitalWrite(LED_PIN, m_ledState);
