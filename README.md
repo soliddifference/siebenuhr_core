@@ -40,15 +40,30 @@ lib_deps =
 
 ### With ESPHome
 
-Include the library via `external_components` in your ESPHome configuration:
+Include the library via `libraries` in your ESPHome configuration:
 
 ```yaml
-external_components:
-  - source:
-      type: git
-      url: https://github.com/soliddifference/siebenuhr_core.git
-      ref: main
+libraries:
+    - https://github.com/soliddifference/siebenuhr_core.git
 ```
+
+### Local Repository (Dev Mode)
+
+To work with a local version of the library during development, reference the library using a file:// path instead of a GitHub URL. This allows for faster compile and testing without requiring Git commits.
+
+```ini
+lib_deps =
+  file://C:\local\path\to\the\core_package\dir\siebenuhr_core
+```
+
+or for ESPHOME:
+
+```yaml
+libraries:
+    - file://C:\local\path\to\the\core_package\dir\siebenuhr_core
+```
+
+Replace the path above with the location of your locally checked-out repository.
 
 ## Contributing
 
