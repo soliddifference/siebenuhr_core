@@ -1,7 +1,7 @@
 #include "siebenuhr_controller.h"
 #include <Arduino.h>
 
-const int LED_PIN = 2;
+// const int LED_PIN = 2;
 
 namespace siebenuhr_core
 {
@@ -30,13 +30,18 @@ namespace siebenuhr_core
         m_interval = interval;
     }
 
+    void Controller::setLEDPin(int pin) 
+    {
+        m_ledPin = pin;
+    }
+
     void Controller::update() 
     {
         unsigned long currentMillis = millis();
         if (currentMillis - m_previousMillis >= m_interval) {
             m_previousMillis = currentMillis;
             m_ledState = !m_ledState;
-            digitalWrite(LED_PIN, m_ledState);
+            digitalWrite(m_ledPin, m_ledState);
         }
     }
 }
