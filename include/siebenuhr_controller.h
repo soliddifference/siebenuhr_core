@@ -14,5 +14,9 @@ namespace siebenuhr_core
         Controller() = default;
 
     	static Controller* s_instance;
+
+        unsigned long m_previousMillis;
+        unsigned long m_interval;
+        bool m_ledState;
     };
 }

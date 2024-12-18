@@ -1,4 +1,7 @@
 #include "siebenuhr_controller.h"
+#include <Arduino.h>
+
+const int LED_PIN = 2;
 
 namespace siebenuhr_core
 {
@@ -15,11 +18,20 @@ namespace siebenuhr_core
 
     void Controller::initialize() 
     {
-        // just some basic code to test the library integration
+        m_previousMillis = 0;
+        m_interval = 500;
+        m_ledState = false;
+
+        pinMode(LED_PIN, OUTPUT);
     }
 
     void Controller::update() 
     {
-        // just some basic code to test the library integration
+        unsigned long currentMillis = millis();
+        if (currentMillis - m_previousMillis >= interval) {
+            m_previousMillis = currentMillis;
+            m_ledState = !m_ledState;
+            digitalWrite(LED_PIN, m_ledState);
+        }
     }
 }
