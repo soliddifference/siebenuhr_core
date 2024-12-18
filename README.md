@@ -43,8 +43,8 @@ lib_deps =
 Include the library via `libraries` in your ESPHome configuration:
 
 ```yaml
-    libraries:
-     - https://github.com/soliddifference/siebenuhr_core.git
+libraries:
+    - https://github.com/soliddifference/siebenuhr_core.git
 ```
 
 ### Local Repository (Dev Mode)
@@ -59,8 +59,8 @@ lib_deps =
 or for ESPHOME:
 
 ```yaml
-    libraries:
-     - file://C:\local\path\to\the\core_package\dir\siebenuhr_core
+libraries:
+    - file://C:\local\path\to\the\core_package\dir\siebenuhr_core
 ```
 
 Replace the path above with the location of your locally checked-out repository.
