@@ -2,8 +2,17 @@
 
 namespace siebenuhr_core
 {
-    Glyph::Glyph(int segmentCount, int ledsPerSegment)
+    Glyph::Glyph(int numSegments, int numLEDsPerSegments)
+        : m_numSegments(numSegments)
+        , m_numLEDsPerSegments(numLEDsPerSegments)
+
     {
-        m_numLEDS = segmentCount * ledsPerSegment;
+        m_numLEDS = m_numSegments * m_numLEDsPerSegments;
+    }
+
+    void Glyph::attach(int glyphID, int glyphCount) 
+    {
+        m_glyphID = glyphID;
+        m_glyphOffset = (glyphCount-m_glyphID-1)*m_numSegments*m_numLEDsPerSegments;
     }
 }

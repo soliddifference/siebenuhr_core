@@ -14,7 +14,7 @@ public:
 
     static Controller* getInstance();
 
-    void initialize(ClockType clockType);
+    void initialize(ClockType clockType, int numGlyphs);
     void update();
 
     void setHeartbeatEnabled(bool isEnabled);
@@ -28,7 +28,7 @@ private:
 
     // Heartbeat control
     bool m_heartbeatEnabled = false;
-    int m_heartbeatPin = constants::DefaultHeartbeatPin;
+    int m_heartbeatPin = constants::PinHeartbeat;
     unsigned long m_lastHeartbeatTime = 0;
     unsigned long m_heartbeatInterval = 1000;
     bool m_heartbeatState = false;

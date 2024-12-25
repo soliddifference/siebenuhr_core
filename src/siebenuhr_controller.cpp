@@ -10,31 +10,39 @@ enum class ClockType {
 
 Controller* Controller::s_instance = nullptr;
 
-Controller* Controller::getInstance() {
+Controller* Controller::getInstance() 
+{
     if (Controller::s_instance == nullptr) {
         Controller::s_instance = new Controller();
     }
     return Controller::s_instance;
 }
 
-void Controller::initialize(ClockType clockType) {
+void Controller::initialize(ClockType clockType, int numGlyphs) 
+{
+    int count = numGlyphs == -1 ? constants::GlyphCount : numGlyphs;
+
     if (clockType == ClockType::Mini) {
         // Setup mini clock
-        m_display = new Display(constants::GlyphCount, constants::SegmentCount, constants::MiniLedsPerSegment);
+        m_display = new Display(numGlyphs, constants::SegmentCount, constants::MiniLedsPerSegment);
     } else {
         // Setup regular clock
-        m_display = new Display(constants::GlyphCount, constants::SegmentCount, constants::RegularLedsPerSegment);
+        m_display = new Display(numGlyphs, constants::SegmentCount, constants::RegularLedsPerSegment);
     }
 
     // Heartbeat setup
     pinMode(m_heartbeatPin, OUTPUT);
 }
 
-void Controller::setHeartbeatEnabled(bool isEnabled) {
+void Controller::setHeartbeatEnabled(bool isEnabled) 
+{
     m_heartbeatEnabled = isEnabled;
 }
 
-void Controller::update() {
+void Controller::update() 
+{
+    m_display->update();
+
     unsigned long currentMillis = millis();
     if (m_heartbeatEnabled && (currentMillis - m_lastHeartbeatTime >= m_heartbeatInterval)) {
         m_lastHeartbeatTime = currentMillis;

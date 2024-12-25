@@ -7,8 +7,10 @@ namespace siebenuhr_core
     class Glyph 
     {
     public:
-        Glyph(int segmentCount, int ledsPerSegment);
+        Glyph(int numSegments, int numLEDsPerSegments);
         ~Glyph() = default;
+
+        void attach(int glyphID, int glyphCount);
 
     private:        
         int m_numLEDS;
@@ -16,5 +18,8 @@ namespace siebenuhr_core
 
         int m_glyphID;
         int m_glyphOffset;
+
+        int m_numSegments;
+        int m_numLEDsPerSegments;
     };
 }
