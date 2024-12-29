@@ -8,7 +8,8 @@ namespace siebenuhr_core::constants {
     constexpr int SegmentCount = 7;
 
     // default clock setting
-    constexpr int DefaultBrightness = 128;
+    constexpr int FPS = 26;
+    constexpr int DefaultBrightness = 255;
 
     // MINI CLOCK
     constexpr int MiniLedsPerSegment = 4;

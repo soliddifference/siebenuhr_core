@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+
+# IDE / Frameworks
+.pio
+.vscode
+.DS_Store
