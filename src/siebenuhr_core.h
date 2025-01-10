@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Arduino.h>
+
 namespace siebenuhr_core
 {
     namespace constants 
@@ -31,4 +33,14 @@ namespace siebenuhr_core
         }
         return value;
     }
+
+    enum LogLevel {
+        LOG_LEVEL_ERROR,
+        LOG_LEVEL_WARN,
+        LOG_LEVEL_INFO,
+        LOG_LEVEL_DEBUG
+    };
+
+    extern void setLogLevel(LogLevel level);
+    extern void logMessage(LogLevel level, const char *format, ...);
 }

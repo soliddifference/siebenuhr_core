@@ -11,13 +11,6 @@
 
 namespace siebenuhr_core
 {
-    enum LogLevel {
-        LOG_LEVEL_ERROR,
-        LOG_LEVEL_WARN,
-        LOG_LEVEL_INFO,
-        LOG_LEVEL_DEBUG
-    };
-
     enum ClockType {
         CLOCK_TYPE_MINI,
         CLOCK_TYPE_REGULAR
@@ -35,8 +28,6 @@ namespace siebenuhr_core
         void setHeartbeatEnabled(bool isEnabled);
         void setBrightness(int value, bool saveToEEPROM = true);
 
-        void logMessage(LogLevel level, const char *format, ...);
-
     private:
         Display() = default;
         ~Display() = default;
@@ -44,8 +35,6 @@ namespace siebenuhr_core
         void initializeGlyphs(int numSegments, int ledsPerSegment);
 
         static Display* s_instance;
-
-        LogLevel m_currentLogLevel {LOG_LEVEL_DEBUG} ;
 
         ClockType m_clockType;
         unsigned long m_lastUpdateTime = 0;
