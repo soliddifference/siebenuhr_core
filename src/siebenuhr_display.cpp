@@ -2,6 +2,7 @@
 
 #include "siebenuhr_core.h"
 #include "siebenuhr_display.h"
+#include "siebenuhr_eeprom.h"
 
 namespace siebenuhr_core
 {
@@ -31,19 +32,9 @@ namespace siebenuhr_core
         m_powerEnabled = true;
 
         // set saved configuration
-        m_nBrightness = constants::DefaultBrightness;
-       	// TODO: _nBrightness = _inst->readFromEEPROM(EEPROM_ADDRESS_BRIGHTNESS);
+        m_nBrightness = Configuration::loadBrightness();
         setBrightness(m_nBrightness);
     }
-
-    // Display::Display(int numGlyphs, int numSegments, int ledsPerSegment)
-    //     : m_numGlyphs(numGlyphs)
-    //     , m_numSegments(numSegments)
-    //     , m_numLEDsPerSegments(ledsPerSegment)
-    //     , m_powerEnabled(true)
-    // {
-    //     initialize(); // todo: 
-    // }
 
     void Display::setHeartbeatEnabled(bool isEnabled) 
     {
@@ -111,15 +102,11 @@ namespace siebenuhr_core
     }
     
     void Display::setBrightness(int value, bool saveToEEPROM) {
-        if (value > 255) {
-            value = 255;
-        } else if (value < 0) {
-            value = 0;
-        }
+        value = clamp(value, 0, 255);
 
-        // if (saveToEEPROM) {
-        //     siebenuhr::Controller::getInstance()->writeToEEPROM(EEPROM_ADDRESS_BRIGHTNESS, value);
-        // }
+        if (saveToEEPROM) {
+            Configuration::saveBrightness(value);
+        }
 
         m_nBrightness = value;
         FastLED.setBrightness(m_nBrightness);
