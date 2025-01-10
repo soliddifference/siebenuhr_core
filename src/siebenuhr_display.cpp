@@ -5,13 +5,53 @@
 
 namespace siebenuhr_core
 {
-    Display::Display(int numGlyphs, int numSegments, int ledsPerSegment)
-        : m_numGlyphs(numGlyphs)
-        , m_numSegments(numSegments)
-        , m_numLEDsPerSegments(ledsPerSegment)
-        , m_powerEnabled(true)
+    Display* Display::s_instance = nullptr;
+
+    Display* Display::getInstance() 
     {
-        initialize(); // todo: 
+        if (Display::s_instance == nullptr) {
+            Display::s_instance = new Display();
+        }
+        return Display::s_instance;
+    }
+
+    void Display::initialize(ClockType clockType, int numGlyphs)
+    {
+        Serial.begin(115200);
+
+        m_clockType = clockType;
+        m_numGlyphs = numGlyphs;
+        if (m_clockType == ClockType::CLOCK_TYPE_MINI) {
+            // Setup mini clock
+            initializeGlyphs(constants::SegmentCount, constants::MiniLedsPerSegment);
+        } else {
+            // Setup regular clock
+            initializeGlyphs(constants::SegmentCount, constants::RegularLedsPerSegment);
+        }
+        m_powerEnabled = true;
+
+        // set saved configuration
+        m_nBrightness = constants::DefaultBrightness;
+       	// TODO: _nBrightness = _inst->readFromEEPROM(EEPROM_ADDRESS_BRIGHTNESS);
+        setBrightness(m_nBrightness);
+    }
+
+    // Display::Display(int numGlyphs, int numSegments, int ledsPerSegment)
+    //     : m_numGlyphs(numGlyphs)
+    //     , m_numSegments(numSegments)
+    //     , m_numLEDsPerSegments(ledsPerSegment)
+    //     , m_powerEnabled(true)
+    // {
+    //     initialize(); // todo: 
+    // }
+
+    void Display::setHeartbeatEnabled(bool isEnabled) 
+    {
+        m_heartbeatEnabled = isEnabled;
+        if (m_heartbeatEnabled)
+        {
+            pinMode(m_heartbeatPin, OUTPUT);
+        }
     }
 
     void Display::logMessage(LogLevel level, const char *format, ...) {
@@ -34,25 +74,14 @@ namespace siebenuhr_core
         Serial.println(buffer);
     }
 
-    void Display::initialize()
+    void Display::initializeGlyphs(int numSegments, int ledsPerSegment) 
     {
-        Serial.begin(115200);
+        m_numSegments = numSegments;
+        m_numLEDsPerSegments = ledsPerSegment;
 
-        initializeGlyphs();
-
-        // set saved configuration
-        m_nBrightness = constants::DefaultBrightness;
-       	// TODO: _nBrightness = _inst->readFromEEPROM(EEPROM_ADDRESS_BRIGHTNESS);
-        setBrightness(m_nBrightness);
-    }
-
-    void Display::initializeGlyphs() 
-    {
         assert(m_numGlyphs > 0 && "Glyph count must be greater 0.");
         assert(m_numSegments > 0 && "Segnent count per glyph must be greater 0.");
         assert(m_numLEDsPerSegments > 0 && "LED count per segment must be greater 0.");
-
-        ESP_LOGW("lib_name", "Message for print!!!"); 
 
         m_numLEDs = m_numSegments * m_numLEDsPerSegments * m_numGlyphs;
 
@@ -99,6 +128,8 @@ namespace siebenuhr_core
     void Display::update() 
     {
         unsigned long currentMillis = millis();
+
+        // update glyphs
         if (m_powerEnabled && (currentMillis - m_lastUpdateTime >= 1000 / constants::FPS)) // Adjust for FPS
         {
             m_lastUpdateTime = currentMillis;
@@ -109,6 +140,13 @@ namespace siebenuhr_core
             }
 
             FastLED.show();
+        }
+
+        // update heartbeat led
+        if (m_heartbeatEnabled && (currentMillis - m_lastHeartbeatTime >= m_heartbeatInterval)) {
+            m_lastHeartbeatTime = currentMillis;
+            m_heartbeatState = !m_heartbeatState;
+            digitalWrite(m_heartbeatPin, m_heartbeatState);
         }
     }
 
