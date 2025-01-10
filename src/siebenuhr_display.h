@@ -3,13 +3,9 @@
 #include "siebenuhr_glyph.h"
 #include <FastLED.h>
 
-#include <vector>
+#include "FX/snake.h"
 
-// Segment adjacency map with entry/exit alignment
-struct SegmentConnection {
-    size_t nextSegment;
-    bool entryDirection;
-};
+#include <vector>
 
 namespace siebenuhr_core
 {
@@ -51,15 +47,8 @@ namespace siebenuhr_core
 
         Glyph** m_glyphs;
        	CRGB *m_LEDs;
-
-        // test animation
-        size_t getLEDIndex(size_t segment, size_t ledPos);
-        void selectNextSegment(std::vector<std::vector<SegmentConnection>> &map);
-
-        size_t m_curSegment = 0;
-        size_t m_curLEDPos = 0;
-        bool m_directionUp = true;
-
         int *m_LEDCols;
+
+        SnakeFX *m_effect;
     };
 }
