@@ -15,4 +15,19 @@ namespace siebenuhr_core
         m_glyphID = glyphID;
         m_glyphOffset = (glyphCount-m_glyphID-1)*m_numSegments*m_numLEDsPerSegments;
     }
+
+    void Glyph::setEffect(Effect *effect)
+    {
+        m_effect = effect;
+        m_effect->setGlyphOffset(m_glyphOffset);
+    }
+
+    void Glyph::update(unsigned long currentMillis, CRGB *LEDs)
+    {
+        if (m_effect != nullptr) 
+        {
+            m_effect->update(currentMillis, LEDs);
+        }
+    }
+
 }

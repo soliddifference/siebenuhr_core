@@ -4,6 +4,8 @@
 #include "siebenuhr_display.h"
 #include "siebenuhr_eeprom.h"
 
+#include "FX/snake.h"
+
 namespace siebenuhr_core
 {
     Display* Display::s_instance = nullptr;
@@ -61,13 +63,12 @@ namespace siebenuhr_core
         {
             m_glyphs[i] = new Glyph(m_numSegments, m_numLEDsPerSegments);
             m_glyphs[i]->attach(i, m_numGlyphs);
+            m_glyphs[i]->setEffect(new SnakeFX(m_numLEDs, m_numLEDsPerSegments));
         }
 
         m_LEDs = new CRGB[m_numLEDs];
 		FastLED.addLeds<NEOPIXEL, constants::PinLEDs>(m_LEDs, m_numLEDs);
         FastLED.clear(true);
-
-        m_effect = new SnakeFX(m_numLEDs, m_numLEDsPerSegments);
 
         logMessage(LOG_LEVEL_INFO, "Display setup: %d %d %d %d", m_numGlyphs, m_numSegments, m_numLEDsPerSegments, m_numLEDs);
     }
@@ -101,9 +102,9 @@ namespace siebenuhr_core
         {
             m_lastUpdateTime = currentMillis;
 
-            if (m_effect != nullptr) 
+            for (size_t i = 0; i < m_numGlyphs; ++i) 
             {
-                m_effect->update(m_LEDs);
+                m_glyphs[i]->update(currentMillis, m_LEDs);
             }
 
             FastLED.show();

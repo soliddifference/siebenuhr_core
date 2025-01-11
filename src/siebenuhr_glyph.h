@@ -1,6 +1,7 @@
 #pragma once
 
-#include <FastLED.h>
+#include "siebenuhr_core.h"
+#include "siebenuhr_effect.h"
 
 namespace siebenuhr_core
 {
@@ -11,6 +12,9 @@ namespace siebenuhr_core
         ~Glyph() = default;
 
         void attach(int glyphID, int glyphCount);
+        void update(unsigned long currentMillis, CRGB *LEDs);
+
+        void setEffect(Effect *effect);
 
     private:        
         int m_numLEDS;
@@ -21,5 +25,7 @@ namespace siebenuhr_core
 
         int m_numSegments;
         int m_numLEDsPerSegments;
+        
+        Effect *m_effect;
     };
 }

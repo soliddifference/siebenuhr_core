@@ -1,6 +1,6 @@
 #pragma once
 
-#include <FastLED.h>
+#include "siebenuhr_core.h"
 
 namespace siebenuhr_core
 {
@@ -8,6 +8,14 @@ namespace siebenuhr_core
     {
         public:
             virtual void initialize() = 0;
-            virtual void update(CRGB *m_LEDs) = 0;
+            virtual void update(unsigned long currentMillis, CRGB *LEDs) = 0;
+
+            void setGlyphOffset(int offset)
+            {
+                m_glyphOffset = offset;
+            }
+
+        protected:
+            int m_glyphOffset = 0;
     };
 }
