@@ -160,6 +160,12 @@ namespace siebenuhr_core
 
         void setEffect(Effect *effect);
 
+        void setAscii(char value) 
+        {
+            m_curAscii = value;
+            m_curAscii = clamp(m_curAscii, 0, 126);
+        }
+
     private:
         int m_numLEDS;
         CRGB m_colorBase;
@@ -170,8 +176,7 @@ namespace siebenuhr_core
         int m_numSegments;
         int m_numLEDsPerSegments;
 
-        // test
-        int char_id = 0;
+        int m_curAscii = 0;
 
         Effect *m_effect;
     };

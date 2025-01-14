@@ -7,6 +7,7 @@
 
 #include "FX/snake.h"
 
+#include <string>
 #include <vector>
 
 namespace siebenuhr_core
@@ -56,6 +57,9 @@ namespace siebenuhr_core
         int m_numLEDs;
         Glyph** m_glyphs;
        	CRGB *m_LEDs;
+
+        std::string m_text;
+        int m_curTextPos = 0;
 
         SnakeFX *m_effect;
     };

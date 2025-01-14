@@ -22,6 +22,8 @@ namespace siebenuhr_core
     {
         Serial.begin(115200);
 
+        m_text = "7uhr";
+
         m_clockType = clockType;
         m_numGlyphs = numGlyphs;
         if (m_clockType == ClockType::CLOCK_TYPE_MINI) {
@@ -63,7 +65,8 @@ namespace siebenuhr_core
         {
             m_glyphs[i] = new Glyph(m_numSegments, m_numLEDsPerSegments);
             m_glyphs[i]->attach(i, m_numGlyphs);
-            m_glyphs[i]->setEffect(new SnakeFX(m_numLEDs, m_numLEDsPerSegments));
+            m_glyphs[i]->setAscii('7');
+            // m_glyphs[i]->setEffect(new SnakeFX(m_numLEDs, m_numLEDsPerSegments));
         }
 
         m_LEDs = new CRGB[m_numLEDs];
@@ -115,6 +118,9 @@ namespace siebenuhr_core
             m_lastHeartbeatTime = currentMillis;
             m_heartbeatState = !m_heartbeatState;
             digitalWrite(m_heartbeatPin, m_heartbeatState);
+
+            m_curTextPos = (m_curTextPos+1) % m_text.size();
+            m_glyphs[0]->setAscii(m_text[m_curTextPos]);           
         }
     }
 
