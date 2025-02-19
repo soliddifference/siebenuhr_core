@@ -73,7 +73,7 @@ namespace siebenuhr_core
 		FastLED.addLeds<NEOPIXEL, constants::PinLEDs>(m_LEDs, m_numLEDs);
         FastLED.clear(true);
 
-        logMessage(LOG_LEVEL_INFO, "Display setup: %d %d %d %d", m_numGlyphs, m_numSegments, m_numLEDsPerSegments, m_numLEDs);
+        logMessage(LOG_LEVEL_INFO, "Display setup: #Glyphs=%d #Seg=%d #LEDpSeg=%d #LEDs=%d", m_numGlyphs, m_numSegments, m_numLEDsPerSegments, m_numLEDs);
     }
 
     void Display::setPowerEnabled(bool isEnabled) 
@@ -120,7 +120,11 @@ namespace siebenuhr_core
             digitalWrite(m_heartbeatPin, m_heartbeatState);
 
             m_curTextPos = (m_curTextPos+1) % m_text.size();
-            m_glyphs[0]->setAscii(m_text[m_curTextPos]);           
+
+            for (size_t i = 0; i < m_numGlyphs; ++i) 
+            {
+                m_glyphs[i]->setAscii(m_text[m_curTextPos]);           
+            }
         }
     }
 

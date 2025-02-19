@@ -14,6 +14,8 @@ namespace siebenuhr_core
     {
         m_glyphID = glyphID;
         m_glyphOffset = (glyphCount - m_glyphID - 1) * m_numSegments * m_numLEDsPerSegments;
+
+        logMessage(LOG_LEVEL_INFO, "glyph:attach => ID:%d Offset:%d", m_glyphID, m_glyphOffset);
     }
 
     void Glyph::setEffect(Effect *effect)

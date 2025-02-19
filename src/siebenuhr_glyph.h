@@ -164,6 +164,8 @@ namespace siebenuhr_core
         {
             m_curAscii = value;
             m_curAscii = clamp(m_curAscii, 0, 126);
+
+            logMessage(LOG_LEVEL_INFO, "glyph:setAscii => %d set char: %c", m_glyphID, (char)m_curAscii);
         }
 
     private:
