@@ -3,6 +3,7 @@
 #include "siebenuhr_core.h"
 #include "siebenuhr_glyph.h"
 
+#include <RunningAverage.h>
 #include <FastLED.h>
 
 #include "FX/snake.h"
@@ -32,7 +33,7 @@ namespace siebenuhr_core
         void setText(const std::string& text);
 
     private:
-        Display() = default;
+        Display();
         ~Display() = default;
 
         void initializeGlyphs(int numSegments, int ledsPerSegment);
@@ -64,5 +65,8 @@ namespace siebenuhr_core
         int m_curTextPos = 0;
 
         SnakeFX *m_effect;
+
+        unsigned long m_lastUpdateMillis;
+        RunningAverage m_avgComputionTime;
     };
 }

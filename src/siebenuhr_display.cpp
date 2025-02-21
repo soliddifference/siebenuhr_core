@@ -18,6 +18,11 @@ namespace siebenuhr_core
         return Display::s_instance;
     }
 
+    Display::Display()
+        : m_avgComputionTime(100)
+    {
+    }
+
     void Display::initialize(ClockType clockType, int numGlyphs)
     {
         Serial.begin(115200);
@@ -72,6 +77,8 @@ namespace siebenuhr_core
 
 		FastLED.addLeds<NEOPIXEL, constants::PinLEDs>(m_LEDs, m_numLEDs);
         FastLED.clear(true);
+
+        m_lastUpdateMillis = millis();
 
         logMessage(LOG_LEVEL_INFO, "Display setup: #Glyphs=%d #Seg=%d #LEDpSeg=%d #LEDs=%d", m_numGlyphs, m_numSegments, m_numLEDsPerSegments, m_numLEDs);
     }
@@ -138,13 +145,11 @@ namespace siebenuhr_core
             m_heartbeatState = !m_heartbeatState;
             digitalWrite(m_heartbeatPin, m_heartbeatState);
 
-            // // test code to render/animate some letters
-            // m_curTextPos = (m_curTextPos+1) % m_text.size();
-            // for (size_t i = 0; i < m_numGlyphs; ++i) 
-            // {
-            //     m_glyphs[i]->setAscii(m_text[m_curTextPos]);           
-            // }
+            logMessage(LOG_LEVEL_INFO, "ø FrameTime: %f", m_avgComputionTime.getAverage());
         }
+
+        m_avgComputionTime.addValue(currentMillis - m_lastUpdateMillis);
+        m_lastUpdateMillis = currentMillis;
     }
 
 }
