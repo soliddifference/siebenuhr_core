@@ -59,17 +59,17 @@ namespace siebenuhr_core
         assert(m_numLEDsPerSegments > 0 && "LED count per segment must be greater 0.");
 
         m_numLEDs = m_numSegments * m_numLEDsPerSegments * m_numGlyphs;
+        m_LEDs = new CRGB[m_numLEDs];
 
         m_glyphs = new Glyph*[m_numGlyphs];
         for (size_t i = 0; i < m_numGlyphs; ++i) 
         {
             m_glyphs[i] = new Glyph(m_numSegments, m_numLEDsPerSegments);
-            m_glyphs[i]->attach(i, m_numGlyphs);
+            m_glyphs[i]->attach(i, m_numGlyphs, m_LEDs);
             m_glyphs[i]->setAscii('7');
             // m_glyphs[i]->setEffect(new SnakeFX(m_numLEDs, m_numLEDsPerSegments));
         }
 
-        m_LEDs = new CRGB[m_numLEDs];
 		FastLED.addLeds<NEOPIXEL, constants::PinLEDs>(m_LEDs, m_numLEDs);
         FastLED.clear(true);
 
@@ -107,7 +107,7 @@ namespace siebenuhr_core
 
             for (size_t i = 0; i < m_numGlyphs; ++i) 
             {
-                m_glyphs[i]->update(currentMillis, m_LEDs);
+                m_glyphs[i]->update(currentMillis);
             }
 
             FastLED.show();
@@ -119,8 +119,8 @@ namespace siebenuhr_core
             m_heartbeatState = !m_heartbeatState;
             digitalWrite(m_heartbeatPin, m_heartbeatState);
 
+            // test code to render/animate some letters
             m_curTextPos = (m_curTextPos+1) % m_text.size();
-
             for (size_t i = 0; i < m_numGlyphs; ++i) 
             {
                 m_glyphs[i]->setAscii(m_text[m_curTextPos]);           

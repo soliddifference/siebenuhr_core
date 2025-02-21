@@ -155,31 +155,25 @@ namespace siebenuhr_core
         Glyph(int numSegments, int numLEDsPerSegments);
         ~Glyph() = default;
 
-        void attach(int glyphID, int glyphCount);
-        void update(unsigned long currentMillis, CRGB *LEDs);
+        void attach(int glyphID, int glyphCount, CRGB *LEDs);
+        void update(unsigned long currentMillis);
 
         void setEffect(Effect *effect);
+        void setAscii(char value);
 
-        void setAscii(char value) 
-        {
-            m_curAscii = value;
-            m_curAscii = clamp(m_curAscii, 0, 126);
-
-            logMessage(LOG_LEVEL_INFO, "glyph:setAscii => %d set char: %c", m_glyphID, (char)m_curAscii);
-        }
-
+        void resetLEDS();
+        void lightUpSegment(size_t segmentIndex);
+    
     private:
-        int m_numLEDS;
         CRGB m_colorBase;
-
-        int m_glyphID;
-        int m_glyphOffset;
+        int m_curAscii = 0;
 
         int m_numSegments;
         int m_numLEDsPerSegments;
-
-        int m_curAscii = 0;
-
-        Effect *m_effect;
+        int m_numLEDSPerGlyph;
+        int m_glyphID = 0;
+        int m_glyphOffset = 0;
+        CRGB *m_LEDs = nullptr;
+        Effect *m_effect = nullptr;        
     };
 }

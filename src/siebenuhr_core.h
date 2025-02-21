@@ -22,6 +22,10 @@ namespace siebenuhr_core
 
         // REGULAR CLOCK
         constexpr int RegularLedsPerSegment = 11;
+
+        // colors
+        constexpr CRGB WHITE = CRGB(255, 255, 255);
+        constexpr CRGB BLACK = CRGB(0, 0, 0);
     }
 
     template <typename T>
