@@ -29,6 +29,8 @@ namespace siebenuhr_core
         void setHeartbeatEnabled(bool isEnabled);
         void setBrightness(int value, bool saveToEEPROM = true);
 
+        void setText(const std::string& text);
+
     private:
         Display() = default;
         ~Display() = default;

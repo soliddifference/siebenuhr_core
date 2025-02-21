@@ -8,6 +8,7 @@ namespace siebenuhr_core
     , m_numLEDSPerGlyph(numSegments * numLEDsPerSegments)
     , m_LEDs(nullptr)
     , m_effect(nullptr)
+    , m_curAscii(' ')
     {
     }
 
@@ -23,7 +24,7 @@ namespace siebenuhr_core
         m_glyphOffset = (glyphCount - m_glyphID - 1) * m_numLEDSPerGlyph;
         m_LEDs = LEDs;
     
-        logMessage(LOG_LEVEL_INFO, "Glyph %d attached at offset %d with %d LEDs.", m_glyphID, m_glyphOffset, m_numLEDS);
+        logMessage(LOG_LEVEL_INFO, "Glyph %d attached at offset %d with %d LEDs.", m_glyphID, m_glyphOffset, m_numLEDSPerGlyph);
     }
 
 
@@ -34,7 +35,7 @@ namespace siebenuhr_core
             return;
 
         m_effect->initialize();
-        m_effect->setGlyphOffset(m_glyphOffset);
+        m_effect->attach(m_glyphOffset, m_LEDs);
     }
 
     void Glyph::setAscii(char value) 
@@ -69,7 +70,7 @@ namespace siebenuhr_core
 
         if (m_effect != nullptr)
         {
-            m_effect->update(currentMillis, LEDs);
+            m_effect->update(currentMillis);
             return;
         }
 

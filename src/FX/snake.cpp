@@ -51,7 +51,7 @@ namespace siebenuhr_core
         m_directionUp = true;
     }
 
-    void SnakeFX::update(unsigned long currentMillis, CRGB *LEDs)
+    void SnakeFX::update(unsigned long currentMillis)
     {
         // Dim all LEDs
         for (size_t i = 0; i < m_numLEDs; ++i) 
@@ -85,9 +85,9 @@ namespace siebenuhr_core
         {
             // LEDs[i] = CRGB(m_LEDCols[i], m_LEDCols[i], m_LEDCols[i]);
 
-            LEDs[m_glyphOffset + i].r = m_LEDCols[i];
-            LEDs[m_glyphOffset + i].g = m_LEDCols[i];
-            LEDs[m_glyphOffset + i].b = m_LEDCols[i];
+            m_LEDs[m_glyphOffset + i].r = m_LEDCols[i];
+            m_LEDs[m_glyphOffset + i].g = m_LEDCols[i];
+            m_LEDs[m_glyphOffset + i].b = m_LEDCols[i];
         }
     }
 

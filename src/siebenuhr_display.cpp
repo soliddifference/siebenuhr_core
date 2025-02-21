@@ -22,8 +22,6 @@ namespace siebenuhr_core
     {
         Serial.begin(115200);
 
-        m_text = "7uhr";
-
         m_clockType = clockType;
         m_numGlyphs = numGlyphs;
         if (m_clockType == ClockType::CLOCK_TYPE_MINI) {
@@ -38,6 +36,8 @@ namespace siebenuhr_core
         // set saved configuration
         m_nBrightness = Configuration::loadBrightness();
         setBrightness(m_nBrightness);
+
+        setText("7uhr");
     }
 
     void Display::setHeartbeatEnabled(bool isEnabled) 
@@ -66,7 +66,7 @@ namespace siebenuhr_core
         {
             m_glyphs[i] = new Glyph(m_numSegments, m_numLEDsPerSegments);
             m_glyphs[i]->attach(i, m_numGlyphs, m_LEDs);
-            m_glyphs[i]->setAscii('7');
+            // todo: redo everything here! -> proper initialization from glyph to effect..
             // m_glyphs[i]->setEffect(new SnakeFX(m_numLEDs, m_numLEDsPerSegments));
         }
 
@@ -96,6 +96,25 @@ namespace siebenuhr_core
         FastLED.setBrightness(m_nBrightness);
     }
 
+    void Display::setText(const std::string& text)
+    {
+        m_text = text;
+
+        size_t text_length = m_text.length();
+
+        for (size_t i = 0; i < m_numGlyphs; ++i) 
+        {
+            if (i < text_length)
+            {
+                m_glyphs[i]->setAscii(m_text[i]);
+            }
+            else
+            {
+                m_glyphs[i]->setAscii(' ');
+            }
+        }
+    }
+
     void Display::update() 
     {
         unsigned long currentMillis = millis();
@@ -119,12 +138,12 @@ namespace siebenuhr_core
             m_heartbeatState = !m_heartbeatState;
             digitalWrite(m_heartbeatPin, m_heartbeatState);
 
-            // test code to render/animate some letters
-            m_curTextPos = (m_curTextPos+1) % m_text.size();
-            for (size_t i = 0; i < m_numGlyphs; ++i) 
-            {
-                m_glyphs[i]->setAscii(m_text[m_curTextPos]);           
-            }
+            // // test code to render/animate some letters
+            // m_curTextPos = (m_curTextPos+1) % m_text.size();
+            // for (size_t i = 0; i < m_numGlyphs; ++i) 
+            // {
+            //     m_glyphs[i]->setAscii(m_text[m_curTextPos]);           
+            // }
         }
     }
 

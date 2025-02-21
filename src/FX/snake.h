@@ -18,7 +18,7 @@ namespace siebenuhr_core
             SnakeFX(int numLEDs, int numLEDsPerSegments);
 
             void initialize();
-            void update(unsigned long currentMillis, CRGB *LEDs);
+            void update(unsigned long currentMillis);
 
         protected:
             int m_numLEDs;

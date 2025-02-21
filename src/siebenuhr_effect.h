@@ -8,14 +8,16 @@ namespace siebenuhr_core
     {
         public:
             virtual void initialize() = 0;
-            virtual void update(unsigned long currentMillis, CRGB *LEDs) = 0;
+            virtual void update(unsigned long currentMillis) = 0;
 
-            void setGlyphOffset(int offset)
+            void attach(int offset, CRGB *LEDs)
             {
                 m_glyphOffset = offset;
+                m_LEDs = LEDs;
             }
 
         protected:
             int m_glyphOffset = 0;
+            CRGB *m_LEDs = nullptr;
     };
 }
