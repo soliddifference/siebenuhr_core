@@ -93,6 +93,34 @@ namespace siebenuhr_core
         }
     }
     
+    float smoothedLux = 0.0f;  // Keep this as a static/global variable
+
+    uint8_t getSmoothedBrightnessFromLux(float lux, uint8_t minBrightness, uint8_t maxBrightness) {
+        // Clamp lux to your sensor range
+        if (lux < 2.0f) lux = 2.0f;
+        if (lux > 40.0f) lux = 40.0f;
+
+        // Exponential moving average (smoothing factor)
+        const float alpha = 0.025f;  // lower = smoother, higher = more responsive
+        smoothedLux = (1.0f - alpha) * smoothedLux + alpha * lux;
+
+        // Map smoothed lux to brightness range
+        float normalized = (smoothedLux - 2.0f) / (40.0f - 2.0f);
+        if (normalized < 0.0f) normalized = 0.0f;
+        if (normalized > 1.0f) normalized = 1.0f;
+
+        uint8_t brightness = (uint8_t)(minBrightness + normalized * (maxBrightness - minBrightness));
+        return brightness;
+    }
+
+    void Display::setEnvLightLevel(float currentLux, int minBrightness, int maxBrightness)
+    {
+        uint8_t brightness = getSmoothedBrightnessFromLux(currentLux, minBrightness, maxBrightness);
+        FastLED.setBrightness(brightness);
+
+        // logMessage(LOG_LEVEL_INFO, "Brightness brightness:%d lux:%f", brightness, currentLux);
+    }
+
     void Display::setBrightness(int value, bool saveToEEPROM) {
         value = clamp(value, 0, 255);
 
@@ -155,7 +183,7 @@ namespace siebenuhr_core
             m_heartbeatState = !m_heartbeatState;
             digitalWrite(m_heartbeatPin, m_heartbeatState);
 
-            logMessage(LOG_LEVEL_INFO, "ø FrameTime: %f", m_avgComputionTime.getAverage());
+            // logMessage(LOG_LEVEL_INFO, "ø FrameTime: %f", m_avgComputionTime.getAverage());
         }
 
         m_avgComputionTime.addValue(currentMillis - m_lastUpdateMillis);

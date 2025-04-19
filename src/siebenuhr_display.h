@@ -28,8 +28,11 @@ namespace siebenuhr_core
 
         void setPowerEnabled(bool isEnabled);
         void setHeartbeatEnabled(bool isEnabled);
-        void setBrightness(int value, bool saveToEEPROM = true);
+        void setDynEnabled(bool isEnabled);
 
+        void setEnvLightLevel(float lux, int minBrightness = 10, int maxBrightness = 255);
+
+        void setBrightness(int value, bool saveToEEPROM = true);
         void setText(const std::string& text);
         void setColor(const CRGB& color, int steps = 0);
 
