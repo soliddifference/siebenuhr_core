@@ -25,7 +25,7 @@ namespace siebenuhr_core
 
     void Display::initialize(ClockType clockType, int numGlyphs)
     {
-        Serial.begin(115200);
+        // Serial.begin(115200);
 
         m_clockType = clockType;
         m_numGlyphs = numGlyphs;
@@ -75,7 +75,8 @@ namespace siebenuhr_core
             // m_glyphs[i]->setEffect(new SnakeFX(m_numLEDs, m_numLEDsPerSegments));
         }
 
-		FastLED.addLeds<NEOPIXEL, constants::PinLEDs>(m_LEDs, m_numLEDs);
+		// FastLED.addLeds<NEOPIXEL, constants::PinLEDs>(m_LEDs, m_numLEDs);
+		FastLED.addLeds<WS2812, constants::PinLEDs, GRB>(m_LEDs, m_numLEDs);      
         FastLED.clear(true);
 
         m_lastUpdateMillis = millis();
@@ -101,25 +102,34 @@ namespace siebenuhr_core
 
         m_nBrightness = value;
         FastLED.setBrightness(m_nBrightness);
+
+        logMessage(LOG_LEVEL_INFO, "Display Brightness: %d", m_nBrightness);
     }
 
     void Display::setText(const std::string& text)
     {
         m_text = text;
 
-        size_t text_length = m_text.length();
-
-        for (size_t i = 0; i < m_numGlyphs; ++i) 
+        if (m_glyphs && m_numGlyphs > 0) 
         {
-            if (i < text_length)
+            size_t text_length = m_text.length();
+            for (size_t i = 0; i < m_numGlyphs; ++i) 
             {
-                m_glyphs[i]->setAscii(m_text[i]);
-            }
-            else
-            {
-                m_glyphs[i]->setAscii(' ');
-            }
+                if (i < text_length)
+                {
+                    m_glyphs[i]->setAscii(m_text[i]);
+                }
+                else
+                {
+                    m_glyphs[i]->setAscii(' ');
+                }
+            }                        
         }
+    }
+
+    void Display::setColor(const CRGB& color, int steps)
+    {
+        // todo: 
     }
 
     void Display::update() 

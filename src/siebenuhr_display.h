@@ -14,8 +14,8 @@
 namespace siebenuhr_core
 {
     enum ClockType {
-        CLOCK_TYPE_MINI,
-        CLOCK_TYPE_REGULAR
+        CLOCK_TYPE_REGULAR = 0,
+        CLOCK_TYPE_MINI
     };
 
     class Display 
@@ -31,6 +31,7 @@ namespace siebenuhr_core
         void setBrightness(int value, bool saveToEEPROM = true);
 
         void setText(const std::string& text);
+        void setColor(const CRGB& color, int steps = 0);
 
     private:
         Display();
@@ -58,13 +59,13 @@ namespace siebenuhr_core
         int m_numSegments;
         int m_numLEDsPerSegments;
         int m_numLEDs;
-        Glyph** m_glyphs;
-       	CRGB *m_LEDs;
+        Glyph** m_glyphs = nullptr;
+       	CRGB *m_LEDs = nullptr;
 
         std::string m_text;
         int m_curTextPos = 0;
 
-        SnakeFX *m_effect;
+        SnakeFX *m_effect = nullptr;
 
         unsigned long m_lastUpdateMillis;
         RunningAverage m_avgComputionTime;
