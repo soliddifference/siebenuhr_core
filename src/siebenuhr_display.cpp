@@ -112,10 +112,11 @@ namespace siebenuhr_core
 
     void Display::setEnvLightLevel(float currentLux, int minBrightness, int maxBrightness)
     {
-        uint8_t brightness = getSmoothedBrightnessFromLux(currentLux, minBrightness, maxBrightness);
-        FastLED.setBrightness(brightness);
-
-        // logMessage(LOG_LEVEL_INFO, "Brightness brightness:%d lux:%f", brightness, currentLux);
+        if (m_powerEnabled) 
+        {
+            uint8_t brightness = getSmoothedBrightnessFromLux(currentLux, minBrightness, maxBrightness);
+            FastLED.setBrightness(brightness);
+        }
     }
 
     void Display::setBrightness(int value, bool saveToEEPROM) {
@@ -164,17 +165,29 @@ namespace siebenuhr_core
     {
         unsigned long currentMillis = millis();
 
-        // update glyphs
-        if (m_powerEnabled && (currentMillis - m_lastUpdateTime >= 1000 / constants::FPS)) // Adjust for FPS
+        if (!m_powerEnabled) 
         {
-            m_lastUpdateTime = currentMillis;
-
+            // turn clock off
             for (size_t i = 0; i < m_numGlyphs; ++i) 
             {
-                m_glyphs[i]->update(currentMillis);
+                m_glyphs[i]->resetLEDS();
             }
-
             FastLED.show();
+        }
+        else
+        {
+            // update glyphs
+            if (currentMillis - m_lastUpdateTime >= (1000.0f / constants::FPS)) // Adjust for FPS
+            {
+                m_lastUpdateTime = currentMillis;
+
+                for (size_t i = 0; i < m_numGlyphs; ++i) 
+                {
+                    m_glyphs[i]->update(currentMillis);
+                }
+
+                FastLED.show();
+            }
         }
 
         // update heartbeat led
