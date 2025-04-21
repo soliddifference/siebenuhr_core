@@ -161,11 +161,14 @@ namespace siebenuhr_core
         void setEffect(Effect *effect);
         void setAscii(char value);
 
+        void setColor(const CRGB& color);
+        inline const CRGB& getColor() const;
+        
         void resetLEDS();
         void lightUpSegment(size_t segmentIndex);
     
     private:
-        CRGB m_colorBase;
+        CRGB m_color;
         int m_curAscii = 0;
 
         int m_numSegments;

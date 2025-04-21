@@ -10,6 +10,7 @@ namespace siebenuhr_core
     , m_effect(nullptr)
     , m_curAscii(' ')
     {
+        m_color = constants::WHITE;
     }
 
     void Glyph::attach(int glyphID, int glyphCount, CRGB *LEDs)
@@ -60,10 +61,20 @@ namespace siebenuhr_core
     
         for (size_t e = 0; e < m_numLEDsPerSegments; ++e) 
         {
-            m_LEDs[m_glyphOffset + segmentOffset + e] = constants::WHITE;
+            m_LEDs[m_glyphOffset + segmentOffset + e] = m_color;
         }
     }    
 
+    void Glyph::setColor(const CRGB& color)
+    {
+        m_color = color;
+    }
+
+    const CRGB& Glyph::getColor() const
+    {
+        return m_color;
+    }
+    
     void Glyph::update(unsigned long currentMillis)
     {
         assert(m_LEDs != nullptr && "Attach glyph before running.");

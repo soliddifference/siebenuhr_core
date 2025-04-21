@@ -25,8 +25,6 @@ namespace siebenuhr_core
 
     void Display::initialize(ClockType clockType, int numGlyphs)
     {
-        // Serial.begin(115200);
-
         m_clockType = clockType;
         m_numGlyphs = numGlyphs;
         if (m_clockType == ClockType::CLOCK_TYPE_MINI) {
@@ -75,7 +73,6 @@ namespace siebenuhr_core
             // m_glyphs[i]->setEffect(new SnakeFX(m_numLEDs, m_numLEDsPerSegments));
         }
 
-		// FastLED.addLeds<NEOPIXEL, constants::PinLEDs>(m_LEDs, m_numLEDs);
 		FastLED.addLeds<WS2812, constants::PinLEDs, GRB>(m_LEDs, m_numLEDs);      
         FastLED.clear(true);
 
@@ -157,7 +154,10 @@ namespace siebenuhr_core
 
     void Display::setColor(const CRGB& color, int steps)
     {
-        // todo: 
+        for (size_t i = 0; i < m_numGlyphs; ++i) 
+        {
+            m_glyphs[i]->setColor(color);
+        }
     }
 
     void Display::update() 
@@ -183,7 +183,7 @@ namespace siebenuhr_core
             m_heartbeatState = !m_heartbeatState;
             digitalWrite(m_heartbeatPin, m_heartbeatState);
 
-            // logMessage(LOG_LEVEL_INFO, "ø FrameTime: %f", m_avgComputionTime.getAverage());
+            logMessage(LOG_LEVEL_INFO, "ø FrameTime: %f", m_avgComputionTime.getAverage());
         }
 
         m_avgComputionTime.addValue(currentMillis - m_lastUpdateMillis);
