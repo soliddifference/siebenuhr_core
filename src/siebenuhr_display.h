@@ -30,7 +30,7 @@ namespace siebenuhr_core
         void setHeartbeatEnabled(bool isEnabled);
         void setDynEnabled(bool isEnabled);
 
-        void setEnvLightLevel(float lux, int minBrightness = 10, int maxBrightness = 255);
+        void setEnvLightLevel(float lux, int baseBrightness = 10, int maxBrightnessRange = 255);
 
         void setBrightness(int value, bool saveToEEPROM = true);
         void setText(const std::string& text);

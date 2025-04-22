@@ -91,31 +91,39 @@ namespace siebenuhr_core
     }
     
     float smoothedLux = 0.0f;  // Keep this as a static/global variable
+    constexpr float MIN_LUX = 2.0f;
+    constexpr float MAX_LUX = 40.0f;
 
-    uint8_t getSmoothedBrightnessFromLux(float lux, uint8_t minBrightness, uint8_t maxBrightness) {
+    uint8_t getSmoothedBrightnessFromLux(float lux, uint8_t maxBrightnessRange) {
         // Clamp lux to your sensor range
-        if (lux < 2.0f) lux = 2.0f;
-        if (lux > 40.0f) lux = 40.0f;
+        if (lux < MIN_LUX) lux = MIN_LUX;
+        if (lux > MAX_LUX) lux = MAX_LUX;
 
         // Exponential moving average (smoothing factor)
         const float alpha = 0.025f;  // lower = smoother, higher = more responsive
         smoothedLux = (1.0f - alpha) * smoothedLux + alpha * lux;
 
         // Map smoothed lux to brightness range
-        float normalized = (smoothedLux - 2.0f) / (40.0f - 2.0f);
+        float normalized = (smoothedLux - MIN_LUX) / (MAX_LUX - MIN_LUX);
         if (normalized < 0.0f) normalized = 0.0f;
         if (normalized > 1.0f) normalized = 1.0f;
 
-        uint8_t brightness = (uint8_t)(minBrightness + normalized * (maxBrightness - minBrightness));
+        uint8_t brightness = (uint8_t)(normalized * (maxBrightnessRange));
         return brightness;
     }
 
-    void Display::setEnvLightLevel(float currentLux, int minBrightness, int maxBrightness)
+    // void Display::setEnvLightLevel(float currentLux, int minBrightness, int maxBrightness)
+    void Display::setEnvLightLevel(float currentLux, int baseBrightness, int maxBrightnessRange)
     {
         if (m_powerEnabled) 
         {
-            uint8_t brightness = getSmoothedBrightnessFromLux(currentLux, minBrightness, maxBrightness);
-            FastLED.setBrightness(brightness);
+            uint8_t brightness = getSmoothedBrightnessFromLux(currentLux, maxBrightnessRange);
+
+            int new_brightness = clamp(baseBrightness + brightness, 0, 255);
+
+            FastLED.setBrightness(new_brightness);
+
+            // logMessage(LOG_LEVEL_INFO, "Base: %d Smoothed: %d Brightness: %d", baseBrightness, brightness, new_brightness);
         }
     }
 

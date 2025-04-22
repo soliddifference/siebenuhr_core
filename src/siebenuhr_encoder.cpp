@@ -53,7 +53,7 @@ namespace siebenuhr_core
     }
 
     void UIKnob::setEncoderBoundaries(long minEncoderValue, long maxEncoderValue, long position, bool circleValues) {
-        _pRotaryEncoder->setBoundaries(minEncoderValue, maxEncoderValue, false);
+        _pRotaryEncoder->setBoundaries(minEncoderValue, maxEncoderValue, circleValues);
         setPosition(position);
     }
 
