@@ -3,20 +3,28 @@
 #include <Arduino.h>
 #include <FastLED.h>
 
-#define SIEBENUHR_CORE_VERSION "1.0.6"
+#define SIEBENUHR_CORE_VERSION "1.0.7"
 
 namespace siebenuhr_core
 {
     namespace constants 
     {
-        // GPIOs
-        constexpr int PinHeartbeat = 2;    
-        // constexpr int PinLEDs = 16; // QuinLED Board LED1 
-        constexpr int PinLEDs = 21; // SolidDifference Board LED1 
+        // SolidDifference Board GPIO
+        constexpr int LED1_PIN = 22;
+        constexpr int LED2_PIN = 19;
+        constexpr int LED3_PIN = 23;
+        constexpr int GLYPH_LED_PIN = 21;
+
+        constexpr int USER_BUTTON_PIN = 33;
+        constexpr int BOOT_BUTTON_PIN = 0;
 
         constexpr int SDA_PIN = 14;
-        constexpr int SCL_PIN = 13;
-        
+        constexpr int SCL_PIN = 13;        
+
+        constexpr int ROT_ENC_A_PIN = 26;
+        constexpr int ROT_ENC_B_PIN = 27;
+        constexpr int ROT_ENC_BUTTON_PIN = 18;
+
         // default clock setting
         constexpr int GlyphCount = 4;
         constexpr int SegmentCount = 7;

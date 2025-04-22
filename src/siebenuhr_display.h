@@ -36,6 +36,8 @@ namespace siebenuhr_core
         void setText(const std::string& text);
         void setColor(const CRGB& color, int steps = 0);
 
+        int getBrightness();
+
     private:
         Display();
         ~Display() = default;
@@ -49,7 +51,6 @@ namespace siebenuhr_core
 
         // Heartbeat
         bool m_heartbeatEnabled = false;
-        int m_heartbeatPin = constants::PinHeartbeat;
         unsigned long m_lastHeartbeatTime = 0;
         unsigned long m_heartbeatInterval = 1000;
         bool m_heartbeatState = false;

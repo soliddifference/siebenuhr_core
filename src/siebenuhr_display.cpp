@@ -48,7 +48,7 @@ namespace siebenuhr_core
         m_heartbeatEnabled = isEnabled;
         if (m_heartbeatEnabled)
         {
-            pinMode(m_heartbeatPin, OUTPUT);
+            pinMode(constants::LED1_PIN, OUTPUT);
         }
     }
 
@@ -73,7 +73,7 @@ namespace siebenuhr_core
             // m_glyphs[i]->setEffect(new SnakeFX(m_numLEDs, m_numLEDsPerSegments));
         }
 
-		FastLED.addLeds<WS2812, constants::PinLEDs, GRB>(m_LEDs, m_numLEDs);      
+		FastLED.addLeds<WS2812, constants::GLYPH_LED_PIN, GRB>(m_LEDs, m_numLEDs);      
         FastLED.clear(true);
 
         m_lastUpdateMillis = millis();
@@ -119,7 +119,8 @@ namespace siebenuhr_core
         }
     }
 
-    void Display::setBrightness(int value, bool saveToEEPROM) {
+    void Display::setBrightness(int value, bool saveToEEPROM) 
+    {
         value = clamp(value, 0, 255);
 
         if (saveToEEPROM) {
@@ -130,6 +131,11 @@ namespace siebenuhr_core
         FastLED.setBrightness(m_nBrightness);
 
         logMessage(LOG_LEVEL_INFO, "Display Brightness: %d", m_nBrightness);
+    }
+
+    int Display::getBrightness() 
+    {
+        return m_nBrightness;
     }
 
     void Display::setText(const std::string& text)
@@ -194,7 +200,7 @@ namespace siebenuhr_core
         if (m_heartbeatEnabled && (currentMillis - m_lastHeartbeatTime >= m_heartbeatInterval)) {
             m_lastHeartbeatTime = currentMillis;
             m_heartbeatState = !m_heartbeatState;
-            digitalWrite(m_heartbeatPin, m_heartbeatState);
+            digitalWrite(constants::GLYPH_LED_PIN, m_heartbeatState);
 
             // logMessage(LOG_LEVEL_INFO, "ø FrameTime: %f", m_avgComputionTime.getAverage());
         }
