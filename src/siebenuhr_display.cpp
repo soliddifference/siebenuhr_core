@@ -196,7 +196,7 @@ namespace siebenuhr_core
             m_heartbeatState = !m_heartbeatState;
             digitalWrite(m_heartbeatPin, m_heartbeatState);
 
-            logMessage(LOG_LEVEL_INFO, "ø FrameTime: %f", m_avgComputionTime.getAverage());
+            // logMessage(LOG_LEVEL_INFO, "ø FrameTime: %f", m_avgComputionTime.getAverage());
         }
 
         m_avgComputionTime.addValue(currentMillis - m_lastUpdateMillis);
