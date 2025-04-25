@@ -5,6 +5,9 @@
 #include "siebenuhr_eeprom.h"
 
 #include "FX/snake.h"
+#include "Personalities/FixedColorRenderer.h"
+#include "Personalities/ColorWheelRenderer.h"
+#include "Personalities/RainbowRenderer.h"
 
 namespace siebenuhr_core
 {
@@ -20,6 +23,7 @@ namespace siebenuhr_core
 
     Display::Display()
         : m_avgComputionTime(100)
+        , m_renderer(new FixedColorRenderer(CRGB::White))
     {
     }
 
@@ -146,33 +150,96 @@ namespace siebenuhr_core
         return m_nBrightness;
     }
 
+
+    void Display::setRenderer(std::unique_ptr<IDisplayRenderer> renderer)
+    {
+        m_renderer = std::move(renderer);
+        if (m_renderer)
+        {
+            m_renderer->initialize(m_glyphs, m_numGlyphs);
+            m_renderer->setText(m_text);
+        }
+    }
+    
     void Display::setText(const std::string& text)
     {
         m_text = text;
-
-        if (m_glyphs && m_numGlyphs > 0) 
-        {
-            size_t text_length = m_text.length();
-            for (size_t i = 0; i < m_numGlyphs; ++i) 
-            {
-                if (i < text_length)
-                {
-                    m_glyphs[i]->setAscii(m_text[i]);
-                }
-                else
-                {
-                    m_glyphs[i]->setAscii(' ');
-                }
-            }                        
-        }
+        if (m_renderer)
+            m_renderer->setText(text);
     }
+    
+    // void Display::update()
+    // {
+    //     unsigned long currentMillis = millis();
+    //     if (!m_powerEnabled)
+    //     {
+    //         for (size_t i = 0; i < m_numGlyphs; ++i)
+    //             m_glyphs[i]->resetLEDS();
+    //         FastLED.show();
+    //     }
+    //     else
+    //     {
+    //         if (m_renderer)
+    //             m_renderer->update(currentMillis);
+    
+    //         FastLED.show();
+    //     }
+    //     // Heartbeat and timing logic remains the same...
+    // }
+
+    // void Display::setText(const std::string& text)
+    // {
+    //     m_text = text;
+
+    //     if (m_glyphs && m_numGlyphs > 0) 
+    //     {
+    //         size_t text_length = m_text.length();
+    //         for (size_t i = 0; i < m_numGlyphs; ++i) 
+    //         {
+    //             if (i < text_length)
+    //             {
+    //                 m_glyphs[i]->setAscii(m_text[i]);
+    //             }
+    //             else
+    //             {
+    //                 m_glyphs[i]->setAscii(' ');
+    //             }
+    //         }                        
+    //     }
+    // }
 
     void Display::setColor(const CRGB& color, int steps)
     {
-        for (size_t i = 0; i < m_numGlyphs; ++i) 
-        {
-            m_glyphs[i]->setColor(color);
+        if (m_renderer->supportsColor()) {
+            m_renderer->setColor(color);
         }
+    }
+
+    std::unique_ptr<IDisplayRenderer> Display::createRenderer(PersonalityType personality, const CRGB& defaultColor)
+    {
+        switch (personality) {
+            case PersonalityType::PERSONALITY_SOLIDCOLOR:
+                return std::unique_ptr<IDisplayRenderer>(new FixedColorRenderer(defaultColor));
+            case PersonalityType::PERSONALITY_COLORWHEEL:
+                return std::unique_ptr<IDisplayRenderer>(new ColorWheelRenderer());
+            case PersonalityType::PERSONALITY_RAINBOW:
+                return std::unique_ptr<IDisplayRenderer>(new RainbowRenderer());
+            default:
+                logMessage(LOG_LEVEL_WARN, "Unknown personality type %d, defaulting to solid color", static_cast<int>(personality));
+                return std::unique_ptr<IDisplayRenderer>(new FixedColorRenderer(defaultColor));
+        }
+    }
+
+    void Display::setPersonality(PersonalityType personality)
+    {
+        // Get current color if the current renderer supports it
+        CRGB currentColor = CRGB::White;
+        if (m_renderer->supportsColor()) {
+            currentColor = m_renderer->getColor();
+        }
+
+        // Create and set new renderer
+        setRenderer(createRenderer(personality, currentColor));
     }
 
     void Display::update() 
@@ -190,18 +257,23 @@ namespace siebenuhr_core
         }
         else
         {
-            // update glyphs
-            if (currentMillis - m_lastUpdateTime >= (1000.0f / constants::FPS)) // Adjust for FPS
-            {
-                m_lastUpdateTime = currentMillis;
+            if (m_renderer)
+                m_renderer->update(currentMillis);
 
-                for (size_t i = 0; i < m_numGlyphs; ++i) 
-                {
-                    m_glyphs[i]->update(currentMillis);
-                }
+            FastLED.show();
 
-                FastLED.show();
-            }
+            // // update glyphs
+            // if (currentMillis - m_lastUpdateTime >= (1000.0f / constants::FPS)) // Adjust for FPS
+            // {
+            //     m_lastUpdateTime = currentMillis;
+
+            //     for (size_t i = 0; i < m_numGlyphs; ++i) 
+            //     {
+            //         m_glyphs[i]->update(currentMillis);
+            //     }
+
+            //     FastLED.show();
+            // }
         }
 
         // update heartbeat led

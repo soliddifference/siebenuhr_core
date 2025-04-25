@@ -6,13 +6,20 @@
 #include <RunningAverage.h>
 #include <FastLED.h>
 
+#include "IDisplayRenderer.h"
+
 #include "FX/snake.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 
 namespace siebenuhr_core
 {
+    // Forward declarations
+    class FixedColorRenderer;
+    class ColorWheelRenderer;
+
     enum ClockType {
         CLOCK_TYPE_REGULAR = 0,
         CLOCK_TYPE_MINI
@@ -35,14 +42,17 @@ namespace siebenuhr_core
         void setBrightness(int value, bool saveToEEPROM = true);
         void setText(const std::string& text);
         void setColor(const CRGB& color, int steps = 0);
-
+        
         int getBrightness();
+        void setPersonality(PersonalityType personality);
 
     private:
         Display();
         ~Display() = default;
 
         void initializeGlyphs(int numSegments, int ledsPerSegment);
+        void setRenderer(std::unique_ptr<IDisplayRenderer> renderer);
+        std::unique_ptr<IDisplayRenderer> createRenderer(PersonalityType personality, const CRGB& defaultColor);
 
         static Display* s_instance;
 
@@ -73,5 +83,7 @@ namespace siebenuhr_core
 
         unsigned long m_lastUpdateMillis;
         RunningAverage m_avgComputionTime;
-    };
+    
+        std::unique_ptr<IDisplayRenderer> m_renderer;
+};
 }

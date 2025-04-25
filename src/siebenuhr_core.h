@@ -46,6 +46,12 @@ namespace siebenuhr_core
         constexpr int SensorReadInterval = 2000;
     }
 
+    enum PersonalityType {
+        PERSONALITY_SOLIDCOLOR,
+        PERSONALITY_COLORWHEEL,
+        PERSONALITY_RAINBOW
+    };
+
     template <typename T>
     T clamp(T value, T minValue, T maxValue) 
     {
