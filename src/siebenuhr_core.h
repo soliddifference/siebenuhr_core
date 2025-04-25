@@ -30,7 +30,7 @@ namespace siebenuhr_core
         constexpr int SegmentCount = 7;
 
         constexpr int FPS = 26;
-        constexpr int DefaultBrightness = 255;
+        constexpr int DefaultBrightness = 120;
 
         // MINI CLOCK
         constexpr int MiniLedsPerSegment = 4;

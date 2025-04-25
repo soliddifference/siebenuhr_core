@@ -151,7 +151,6 @@ namespace siebenuhr_core
         return m_nBrightness;
     }
 
-
     void Display::setRenderer(std::unique_ptr<IDisplayRenderer> renderer)
     {
         logMessage(LOG_LEVEL_INFO, "Changing display renderer...");
@@ -174,47 +173,7 @@ namespace siebenuhr_core
         m_text = text;
         if (m_renderer)
             m_renderer->setText(text);
-    }
-    
-    // void Display::update()
-    // {
-    //     unsigned long currentMillis = millis();
-    //     if (!m_powerEnabled)
-    //     {
-    //         for (size_t i = 0; i < m_numGlyphs; ++i)
-    //             m_glyphs[i]->resetLEDS();
-    //         FastLED.show();
-    //     }
-    //     else
-    //     {
-    //         if (m_renderer)
-    //             m_renderer->update(currentMillis);
-    
-    //         FastLED.show();
-    //     }
-    //     // Heartbeat and timing logic remains the same...
-    // }
-
-    // void Display::setText(const std::string& text)
-    // {
-    //     m_text = text;
-
-    //     if (m_glyphs && m_numGlyphs > 0) 
-    //     {
-    //         size_t text_length = m_text.length();
-    //         for (size_t i = 0; i < m_numGlyphs; ++i) 
-    //         {
-    //             if (i < text_length)
-    //             {
-    //                 m_glyphs[i]->setAscii(m_text[i]);
-    //             }
-    //             else
-    //             {
-    //                 m_glyphs[i]->setAscii(' ');
-    //             }
-    //         }                        
-    //     }
-    // }
+    }   
 
     void Display::setColor(const CRGB& color, int steps)
     {
@@ -236,7 +195,7 @@ namespace siebenuhr_core
                     defaultColor.r, defaultColor.g, defaultColor.b);
                 break;
             case PersonalityType::PERSONALITY_COLORWHEEL:
-                renderer = std::unique_ptr<IDisplayRenderer>(new ColorWheelRenderer());
+                renderer = std::unique_ptr<IDisplayRenderer>(new ColorWheelRenderer(defaultColor));
                 logMessage(LOG_LEVEL_INFO, "Created ColorWheel renderer");
                 break;
             case PersonalityType::PERSONALITY_RAINBOW:
@@ -285,19 +244,6 @@ namespace siebenuhr_core
                 m_renderer->update(currentMillis);
 
             FastLED.show();
-
-            // // update glyphs
-            // if (currentMillis - m_lastUpdateTime >= (1000.0f / constants::FPS)) // Adjust for FPS
-            // {
-            //     m_lastUpdateTime = currentMillis;
-
-            //     for (size_t i = 0; i < m_numGlyphs; ++i) 
-            //     {
-            //         m_glyphs[i]->update(currentMillis);
-            //     }
-
-            //     FastLED.show();
-            // }
         }
 
         // update heartbeat led
