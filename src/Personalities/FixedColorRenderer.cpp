@@ -28,11 +28,24 @@ namespace siebenuhr_core
         }
     }
 
-    void FixedColorRenderer::update(unsigned long /*currentMillis*/)
+    void FixedColorRenderer::update(unsigned long currentMillis)
     {
-        for (int i = 0; i < m_numGlyphs; ++i)
+        for (size_t i = 0; i < m_numGlyphs; ++i) 
         {
-            m_glyphs[i]->setColor(m_color);
+            auto glyph = m_glyphs[i];
+            glyph->resetLEDS();
+
+            for (size_t i = 0; i < glyph->getNumSegments(); ++i) 
+            {
+                if (glyph->getSegmentState(i)) 
+                {
+                    auto segmentLEDs = glyph->getSegmentLEDs(i);
+                    for (size_t j = 0; j < glyph->getLEDsPerSegment(); ++j)
+                    {
+                        segmentLEDs[j] = m_color;
+                    }
+                }
+            }
         }
     }
 

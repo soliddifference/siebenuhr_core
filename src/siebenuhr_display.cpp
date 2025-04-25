@@ -23,7 +23,7 @@ namespace siebenuhr_core
 
     Display::Display()
         : m_avgComputionTime(100)
-        , m_renderer(new FixedColorRenderer(CRGB::White))
+        , m_renderer(nullptr)
     {
     }
 
@@ -82,7 +82,8 @@ namespace siebenuhr_core
 
         m_lastUpdateMillis = millis();
 
-        logMessage(LOG_LEVEL_INFO, "Display setup: #Glyphs=%d #Seg=%d #LEDpSeg=%d #LEDs=%d", m_numGlyphs, m_numSegments, m_numLEDsPerSegments, m_numLEDs);
+        logMessage(LOG_LEVEL_INFO, "Display Configuration: Glyphs=%d, Segments=%d, LEDs per Segment=%d, Total LEDs=%d", 
+            m_numGlyphs, m_numSegments, m_numLEDsPerSegments, m_numLEDs);
     }
 
     void Display::setPowerEnabled(bool isEnabled) 
@@ -153,11 +154,18 @@ namespace siebenuhr_core
 
     void Display::setRenderer(std::unique_ptr<IDisplayRenderer> renderer)
     {
+        logMessage(LOG_LEVEL_INFO, "Changing display renderer...");
         m_renderer = std::move(renderer);
         if (m_renderer)
         {
+            logMessage(LOG_LEVEL_INFO, "Initializing new renderer...");
             m_renderer->initialize(m_glyphs, m_numGlyphs);
             m_renderer->setText(m_text);
+            logMessage(LOG_LEVEL_INFO, "Renderer initialized successfully");
+        }
+        else
+        {
+            logMessage(LOG_LEVEL_WARN, "Failed to set renderer - renderer is null");
         }
     }
     
@@ -217,25 +225,41 @@ namespace siebenuhr_core
 
     std::unique_ptr<IDisplayRenderer> Display::createRenderer(PersonalityType personality, const CRGB& defaultColor)
     {
-        switch (personality) {
+        logMessage(LOG_LEVEL_INFO, "Creating new renderer for personality type: %d", static_cast<int>(personality));
+        
+        std::unique_ptr<IDisplayRenderer> renderer;
+        switch (personality)
+        {
             case PersonalityType::PERSONALITY_SOLIDCOLOR:
-                return std::unique_ptr<IDisplayRenderer>(new FixedColorRenderer(defaultColor));
+                renderer = std::unique_ptr<IDisplayRenderer>(new FixedColorRenderer(defaultColor));
+                logMessage(LOG_LEVEL_INFO, "Created SolidColor renderer with default color: R=%d, G=%d, B=%d", 
+                    defaultColor.r, defaultColor.g, defaultColor.b);
+                break;
             case PersonalityType::PERSONALITY_COLORWHEEL:
-                return std::unique_ptr<IDisplayRenderer>(new ColorWheelRenderer());
+                renderer = std::unique_ptr<IDisplayRenderer>(new ColorWheelRenderer());
+                logMessage(LOG_LEVEL_INFO, "Created ColorWheel renderer");
+                break;
             case PersonalityType::PERSONALITY_RAINBOW:
-                return std::unique_ptr<IDisplayRenderer>(new RainbowRenderer());
+                renderer = std::unique_ptr<IDisplayRenderer>(new RainbowRenderer());
+                logMessage(LOG_LEVEL_INFO, "Created Rainbow renderer");
+                break;
             default:
                 logMessage(LOG_LEVEL_WARN, "Unknown personality type %d, defaulting to solid color", static_cast<int>(personality));
-                return std::unique_ptr<IDisplayRenderer>(new FixedColorRenderer(defaultColor));
+                renderer = std::unique_ptr<IDisplayRenderer>(new FixedColorRenderer(defaultColor));
+                break;
         }
+        return renderer;
     }
 
     void Display::setPersonality(PersonalityType personality)
     {
         // Get current color if the current renderer supports it
         CRGB currentColor = CRGB::White;
-        if (m_renderer->supportsColor()) {
+        if (m_renderer && m_renderer->supportsColor())
+        {
             currentColor = m_renderer->getColor();
+            logMessage(LOG_LEVEL_INFO, "Preserving current color: R=%d, G=%d, B=%d", 
+                currentColor.r, currentColor.g, currentColor.b);
         }
 
         // Create and set new renderer

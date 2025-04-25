@@ -160,28 +160,16 @@ namespace siebenuhr_core
 
         void setEffect(Effect *effect);
         void setAscii(char value);
-
-        void setColor(const CRGB& color);
-        inline const CRGB& getColor() const;
         
         void resetLEDS();
-        void lightUpSegment(size_t segmentIndex);
 
         // New getter methods
         inline int getSegmentCount() const { return m_numSegments; }
         inline int getNumSegments() const { return m_numSegments; }  // Alias for getSegmentCount
         inline int getLEDsPerSegment() const { return m_numLEDsPerSegments; }
-        inline int getTotalLEDs() const { return m_numLEDSPerGlyph; }
         inline int getAscii() const { return m_curAscii; }
         inline int getGlyphID() const { return m_glyphID; }
         inline int getGlyphOffset() const { return m_glyphOffset; }
-
-        // New segment control methods
-        void setAllSegments(bool state) {
-            for (size_t i = 0; i < m_numSegments; i++) {
-                setSegmentState(i, state);
-            }
-        }
 
         bool getSegmentState(size_t index) const {
             if (index >= m_numSegments) return false;
@@ -192,20 +180,18 @@ namespace siebenuhr_core
             return getSegmentState(index);
         }
 
-        void setSegmentState(size_t index, bool state) {
-            if (index >= m_numSegments) return;
-            if (state) {
-                lightUpSegment(index);
-            }
+        CRGB* getLEDs() const 
+        { 
+            return m_LEDs + m_glyphOffset; 
         }
-
-        void setSegmentColor(size_t segmentIndex, const CRGB& color) {
-            if (segmentIndex >= m_numSegments) return;
-            if (getSegmentState(segmentIndex)) {
-                lightUpSegment(segmentIndex);
-                setColor(color);
-            }
+        
+        CRGB* getSegmentLEDs(int segmentIndex) const 
+        { 
+            int segmentOffset = segmentIndex * m_numLEDsPerSegments;
+            return m_LEDs + m_glyphOffset + segmentOffset; 
         }
+        
+        size_t getNumLEDs() const { return m_numLEDSPerGlyph; }
     
     private:
         CRGB m_color;

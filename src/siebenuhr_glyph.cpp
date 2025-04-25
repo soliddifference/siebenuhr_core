@@ -55,45 +55,45 @@ namespace siebenuhr_core
         }
     }
 
-    void Glyph::lightUpSegment(size_t segmentIndex)
-    {
-        int segmentOffset = segmentIndex * m_numLEDsPerSegments;
+    // void Glyph::lightUpSegment(size_t segmentIndex)
+    // {
+    //     int segmentOffset = segmentIndex * m_numLEDsPerSegments;
     
-        for (size_t e = 0; e < m_numLEDsPerSegments; ++e) 
-        {
-            m_LEDs[m_glyphOffset + segmentOffset + e] = m_color;
-        }
-    }    
+    //     for (size_t e = 0; e < m_numLEDsPerSegments; ++e) 
+    //     {
+    //         m_LEDs[m_glyphOffset + segmentOffset + e] = m_color;
+    //     }
+    // }    
 
-    void Glyph::setColor(const CRGB& color)
-    {
-        m_color = color;
-    }
+    // void Glyph::setColor(const CRGB& color)
+    // {
+    //     m_color = color;
+    // }
 
-    const CRGB& Glyph::getColor() const
-    {
-        return m_color;
-    }
+    // const CRGB& Glyph::getColor() const
+    // {
+    //     return m_color;
+    // }
     
-    void Glyph::update(unsigned long currentMillis)
-    {
-        assert(m_LEDs != nullptr && "Attach glyph before running.");
+    // void Glyph::update(unsigned long currentMillis)
+    // {
+    //     assert(m_LEDs != nullptr && "Attach glyph before running.");
 
-        if (m_effect != nullptr)
-        {
-            m_effect->update(currentMillis);
-            return;
-        }
+    //     if (m_effect != nullptr)
+    //     {
+    //         m_effect->update(currentMillis);
+    //         return;
+    //     }
 
-        resetLEDS();
+    //     resetLEDS();
 
-        for (size_t i = 0; i < m_numSegments; ++i) 
-        {
-            if (ASCII_TABLE[m_curAscii][i] == 1)
-            {
-                lightUpSegment(i);
-            }
-        }
-    }
+    //     for (size_t i = 0; i < m_numSegments; ++i) 
+    //     {
+    //         if (ASCII_TABLE[m_curAscii][i] == 1)
+    //         {
+    //             lightUpSegment(i);
+    //         }
+    //     }
+    // }
 
 }

@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <FastLED.h>
 
-#define SIEBENUHR_CORE_VERSION "1.0.7"
+#define SIEBENUHR_CORE_VERSION "1.0.10"
 
 namespace siebenuhr_core
 {

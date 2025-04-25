@@ -27,34 +27,34 @@ namespace siebenuhr_core
 
     void RainbowRenderer::update(unsigned long currentMillis)
     {
-        if (currentMillis - m_lastUpdateTime >= m_updateInterval)
-        {
-            m_lastUpdateTime = currentMillis;
+        // if (currentMillis - m_lastUpdateTime >= m_updateInterval)
+        // {
+        //     m_lastUpdateTime = currentMillis;
             
-            // Very small increment for smooth color transition
-            m_hue = (m_hue + 1) % 255; // Increment by 1 for very smooth transition
+        //     // Very small increment for smooth color transition
+        //     m_hue = (m_hue + 1) % 255; // Increment by 1 for very smooth transition
 
-            for (int glyphIndex = 0; glyphIndex < m_numGlyphs; ++glyphIndex)
-            {
-                Glyph* glyph = m_glyphs[glyphIndex];
+        //     for (int glyphIndex = 0; glyphIndex < m_numGlyphs; ++glyphIndex)
+        //     {
+        //         Glyph* glyph = m_glyphs[glyphIndex];
                 
-                // Calculate base hue for this glyph, offset by glyph position
-                uint8_t baseHue = (m_hue + (glyphIndex * 30)) % 255;
+        //         // Calculate base hue for this glyph, offset by glyph position
+        //         uint8_t baseHue = (m_hue + (glyphIndex * 30)) % 255;
 
-                // For each segment in the glyph
-                for (int segmentIndex = 0; segmentIndex < glyph->getNumSegments(); ++segmentIndex)
-                {
-                    if (glyph->isSegmentActive(segmentIndex))
-                    {
-                        // Calculate hue for this segment, with a small offset
-                        uint8_t segmentHue = (baseHue + (segmentIndex * 10)) % 255;
+        //         // For each segment in the glyph
+        //         for (int segmentIndex = 0; segmentIndex < glyph->getNumSegments(); ++segmentIndex)
+        //         {
+        //             if (glyph->isSegmentActive(segmentIndex))
+        //             {
+        //                 // Calculate hue for this segment, with a small offset
+        //                 uint8_t segmentHue = (baseHue + (segmentIndex * 10)) % 255;
                         
-                        // Set color for this segment
-                        CRGB color = CHSV(segmentHue, 255, 255);
-                        glyph->setSegmentColor(segmentIndex, color);
-                    }
-                }
-            }
-        }
+        //                 // Set color for this segment
+        //                 CRGB color = CHSV(segmentHue, 255, 255);
+        //                 glyph->setSegmentColor(segmentIndex, color);
+        //             }
+        //         }
+        //     }
+        // }
     }
 } 
