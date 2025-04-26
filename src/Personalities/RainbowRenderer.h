@@ -10,7 +10,7 @@ namespace siebenuhr_core
     public:
         RainbowRenderer();
         void initialize(Glyph** glyphs, int numGlyphs) override;
-        void update(unsigned long currentMillis) override;
+        void update(unsigned long currentMillis, int hours, int minutes) override;
 
         // Color-related methods
         bool supportsColor() const override { return false; } // Rainbow has its own color logic

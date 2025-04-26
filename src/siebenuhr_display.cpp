@@ -182,6 +182,18 @@ namespace siebenuhr_core
         }
     }
 
+    void Display::setTime(int hours, int minutes) 
+    {
+        m_hours = hours;
+        m_minutes = minutes;
+
+        char formatted_time[5];  // Buffer for "HHMM" + null terminator
+        snprintf(formatted_time, sizeof(formatted_time), "%02d%02d", hours, minutes);
+        setText(std::string(formatted_time));
+
+        logMessage(LOG_LEVEL_INFO, "Time set: %02d:%02d", hours, minutes); 
+    }    
+
     std::unique_ptr<IDisplayRenderer> Display::createRenderer(PersonalityType personality, const CRGB& defaultColor)
     {
         logMessage(LOG_LEVEL_INFO, "Creating new renderer for personality type: %d", static_cast<int>(personality));
@@ -241,7 +253,7 @@ namespace siebenuhr_core
         else
         {
             if (m_renderer)
-                m_renderer->update(currentMillis);
+                m_renderer->update(currentMillis, m_hours, m_minutes);
 
             FastLED.show();
         }

@@ -16,7 +16,7 @@ namespace siebenuhr_core
         m_numGlyphs = numGlyphs;
     }
 
-    void FixedColorRenderer::update(unsigned long currentMillis)
+    void FixedColorRenderer::update(unsigned long currentMillis, int hours, int minutes)
     {
         for (size_t i = 0; i < m_numGlyphs; ++i) 
         {

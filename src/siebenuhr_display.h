@@ -42,6 +42,7 @@ namespace siebenuhr_core
         void setBrightness(int value, bool saveToEEPROM = true);
         void setText(const std::string& text);
         void setColor(const CRGB& color, int steps = 0);
+        void setTime(int hours, int minutes);
         
         int getBrightness();
         void setPersonality(PersonalityType personality);
@@ -76,6 +77,8 @@ namespace siebenuhr_core
         Glyph** m_glyphs = nullptr;
        	CRGB *m_LEDs = nullptr;
 
+        int m_hours = 0;
+        int m_minutes = 0;  
         std::string m_text;
         int m_curTextPos = 0;
 

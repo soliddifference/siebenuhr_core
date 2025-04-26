@@ -17,10 +17,20 @@ namespace siebenuhr_core
         m_numGlyphs = numGlyphs;
     }
 
-    void ColorWheelRenderer::update(unsigned long currentMillis)
+    void ColorWheelRenderer::update(unsigned long currentMillis, int hours, int minutes)
     {
-        m_hue = (m_hue + 1) % 256;
-        m_color = CHSV(m_hue, 255, 255);
+        if (false)
+        {
+            m_hue = (m_hue + 1) % 256;
+            m_color = CHSV(m_hue, 255, 255);
+        } 
+        else
+        {
+            // legacy version from siebenuhr v1.0
+            int sec_of_day = hours * 3600 + minutes * 60;
+            m_hue = (int)(((float)sec_of_day / (float)86400) * 255) % 255;
+            m_color = CHSV(m_hue, 255, 255);
+        }
 
         for (size_t i = 0; i < m_numGlyphs; ++i) 
         {

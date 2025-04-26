@@ -28,7 +28,7 @@ namespace siebenuhr_core
             }
         }
 
-        virtual void update(unsigned long currentMillis) = 0;
+        virtual void update(unsigned long currentMillis, int hours, int minutes) = 0;
 
         // Color-related methods
         virtual bool supportsColor() const { return false; }
