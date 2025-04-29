@@ -17,8 +17,8 @@
 namespace siebenuhr_core
 {
     // Forward declarations
-    class FixedColorRenderer;
-    class ColorWheelRenderer;
+    // class FixedColorRenderer;
+    // class ColorWheelRenderer;
 
     enum ClockType {
         CLOCK_TYPE_REGULAR = 0,
@@ -70,11 +70,11 @@ namespace siebenuhr_core
         unsigned long m_heartbeatInterval = 1000;
         bool m_heartbeatState = false;
 
-        // Glyphs
         bool m_powerEnabled;
-        
         int m_nBrightness;
-        
+        CRGB m_currentColor;
+
+        // Glyphs        
         int m_numGlyphs;
         int m_numSegments;
         int m_numLEDsPerSegments;
@@ -95,5 +95,5 @@ namespace siebenuhr_core
     
         PersonalityType m_currentPersonality;
         std::unique_ptr<IDisplayRenderer> m_renderer;
-};
+    };
 }
