@@ -8,6 +8,7 @@
 #include "Personalities/FixedColorRenderer.h"
 #include "Personalities/ColorWheelRenderer.h"
 #include "Personalities/RainbowRenderer.h"
+#include "Personalities/MosaikRenderer.h"
 
 namespace siebenuhr_core
 {
@@ -225,6 +226,10 @@ namespace siebenuhr_core
                 break;
             case PersonalityType::PERSONALITY_RAINBOW:
                 renderer = std::unique_ptr<IDisplayRenderer>(new RainbowRenderer());
+                logMessage(LOG_LEVEL_INFO, "Created Rainbow renderer");
+                break;
+            case PersonalityType::PERSONALITY_MOSAIK:
+                renderer = std::unique_ptr<IDisplayRenderer>(new MosaikRenderer());
                 logMessage(LOG_LEVEL_INFO, "Created Rainbow renderer");
                 break;
             default:

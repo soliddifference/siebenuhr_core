@@ -16,10 +16,6 @@
 
 namespace siebenuhr_core
 {
-    // Forward declarations
-    // class FixedColorRenderer;
-    // class ColorWheelRenderer;
-
     enum ClockType {
         CLOCK_TYPE_REGULAR = 0,
         CLOCK_TYPE_MINI
