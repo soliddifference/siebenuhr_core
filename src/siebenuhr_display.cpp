@@ -176,7 +176,7 @@ namespace siebenuhr_core
             m_renderer->setText(text);
     }   
 
-    void Display::setNotification(const std::string& text, int duration = 1500)
+    void Display::setNotification(const std::string& text, int duration)
     {
         m_notificationText = text;
         m_notificationDuration = duration;
@@ -190,7 +190,7 @@ namespace siebenuhr_core
         }
     }
 
-    CRGB color void Display::getColor()
+    CRGB Display::getColor()
     {
         return m_currentColor;
     }
@@ -253,7 +253,7 @@ namespace siebenuhr_core
         }
 
         // Create and set new renderer
-        if (setRenderer(createRenderer(personality, currentColor)))
+        if (setRenderer(createRenderer(personality, m_currentColor)))
         {
             m_currentPersonality = personality;
         }
