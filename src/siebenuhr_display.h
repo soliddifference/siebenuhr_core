@@ -37,6 +37,8 @@ namespace siebenuhr_core
         void setHeartbeatEnabled(bool isEnabled);
         void setDynEnabled(bool isEnabled);
 
+        void setNotification(const std::string& text, int duration = 1500);
+
         void setEnvLightLevel(float lux, int baseBrightness = 10, int maxBrightnessRange = 255);
 
         void setBrightness(int value, bool saveToEEPROM = true);
@@ -44,7 +46,9 @@ namespace siebenuhr_core
         void setColor(const CRGB& color, int steps = 0);
         void setTime(int hours, int minutes);
         
+        CRGB getColor();
         int getBrightness();
+
         void setPersonality(PersonalityType personality);
 
     private:
@@ -52,7 +56,7 @@ namespace siebenuhr_core
         ~Display() = default;
 
         void initializeGlyphs(int numSegments, int ledsPerSegment);
-        void setRenderer(std::unique_ptr<IDisplayRenderer> renderer);
+        bool setRenderer(std::unique_ptr<IDisplayRenderer> renderer);
         std::unique_ptr<IDisplayRenderer> createRenderer(PersonalityType personality, const CRGB& defaultColor);
 
         static Display* s_instance;
@@ -68,6 +72,7 @@ namespace siebenuhr_core
 
         // Glyphs
         bool m_powerEnabled;
+        
         int m_nBrightness;
         
         int m_numGlyphs;
@@ -82,11 +87,13 @@ namespace siebenuhr_core
         std::string m_text;
         int m_curTextPos = 0;
 
-        SnakeFX *m_effect = nullptr;
+        std::string m_notificationText = "";
+        int m_notificationDuration = 0; 
 
         unsigned long m_lastUpdateMillis;
         RunningAverage m_avgComputionTime;
     
+        PersonalityType m_currentPersonality;
         std::unique_ptr<IDisplayRenderer> m_renderer;
 };
 }

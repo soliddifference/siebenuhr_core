@@ -151,7 +151,7 @@ namespace siebenuhr_core
         return m_nBrightness;
     }
 
-    void Display::setRenderer(std::unique_ptr<IDisplayRenderer> renderer)
+    bool Display::setRenderer(std::unique_ptr<IDisplayRenderer> renderer)
     {
         logMessage(LOG_LEVEL_INFO, "Changing display renderer...");
         m_renderer = std::move(renderer);
@@ -161,11 +161,12 @@ namespace siebenuhr_core
             m_renderer->initialize(m_glyphs, m_numGlyphs);
             m_renderer->setText(m_text);
             logMessage(LOG_LEVEL_INFO, "Renderer initialized successfully");
+            
+            return true;
         }
-        else
-        {
-            logMessage(LOG_LEVEL_WARN, "Failed to set renderer - renderer is null");
-        }
+
+        logMessage(LOG_LEVEL_WARN, "Failed to set renderer - renderer is null");
+        return false;
     }
     
     void Display::setText(const std::string& text)
@@ -175,11 +176,23 @@ namespace siebenuhr_core
             m_renderer->setText(text);
     }   
 
+    void Display::setNotification(const std::string& text, int duration = 1500)
+    {
+        m_notificationText = text;
+        m_notificationDuration = duration;
+    }
+
     void Display::setColor(const CRGB& color, int steps)
     {
+        m_currentColor = color;
         if (m_renderer->supportsColor()) {
             m_renderer->setColor(color);
         }
+    }
+
+    CRGB color void Display::getColor()
+    {
+        return m_currentColor;
     }
 
     void Display::setTime(int hours, int minutes) 
@@ -224,17 +237,26 @@ namespace siebenuhr_core
 
     void Display::setPersonality(PersonalityType personality)
     {
-        // Get current color if the current renderer supports it
-        CRGB currentColor = CRGB::White;
-        if (m_renderer && m_renderer->supportsColor())
+        if (m_renderer)
         {
-            currentColor = m_renderer->getColor();
-            logMessage(LOG_LEVEL_INFO, "Preserving current color: R=%d, G=%d, B=%d", 
-                currentColor.r, currentColor.g, currentColor.b);
+            if (m_currentPersonality == personality)
+            {
+                logMessage(LOG_LEVEL_INFO, "Personality already set to %d", static_cast<int>(personality));
+                return;
+            }
+
+            if (m_renderer->supportsColor())
+            {
+                m_currentColor = m_renderer->getColor();
+                logMessage(LOG_LEVEL_INFO, "Preserving current color: R=%d, G=%d, B=%d", m_currentColor.r, m_currentColor.g, m_currentColor.b);
+            }
         }
 
         // Create and set new renderer
-        setRenderer(createRenderer(personality, currentColor));
+        if (setRenderer(createRenderer(personality, currentColor)))
+        {
+            m_currentPersonality = personality;
+        }
     }
 
     void Display::update() 
