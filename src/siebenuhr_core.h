@@ -49,7 +49,8 @@ namespace siebenuhr_core
     enum PersonalityType {
         PERSONALITY_SOLIDCOLOR,
         PERSONALITY_COLORWHEEL,
-        PERSONALITY_RAINBOW
+        PERSONALITY_RAINBOW,
+        PERSONALITY_MOSAIK
     };
 
     template <typename T>

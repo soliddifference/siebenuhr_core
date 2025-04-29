@@ -14,8 +14,8 @@ namespace siebenuhr_core
         virtual ~IDisplayRenderer() = default;
 
         virtual void initialize(Glyph** glyphs, int numGlyphs) = 0;
+        virtual void update(unsigned long currentMillis, int hours, int minutes) = 0;
 
-        // virtual void setColor(const CRGB& color) = 0;
         virtual void setText(const std::string& text)
         {
             m_text = text;
@@ -27,8 +27,6 @@ namespace siebenuhr_core
                     m_glyphs[i]->setAscii(' ');
             }
         }
-
-        virtual void update(unsigned long currentMillis, int hours, int minutes) = 0;
 
         // Color-related methods
         virtual bool supportsColor() const { return false; }
