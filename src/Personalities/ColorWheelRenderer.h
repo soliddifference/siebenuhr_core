@@ -13,10 +13,11 @@ namespace siebenuhr_core
         // Color-related methods
         bool supportsColor() const override { return true; }
         void setColor(const CRGB& color) override;
-        CRGB getColor() const override { return m_color; }
+        CRGB getColor() const override { return CHSV(m_hueStartingAngle, 255, 255); }
 
     private:
         uint8_t m_hue = 0;
+        uint8_t m_hueStartingAngle = 0;
         CRGB m_color;
     };
 }

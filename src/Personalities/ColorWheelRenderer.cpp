@@ -28,7 +28,7 @@ namespace siebenuhr_core
         {
             // legacy version from siebenuhr v1.0
             int sec_of_day = hours * 3600 + minutes * 60;
-            m_hue = (int)(((float)sec_of_day / (float)86400) * 255) % 255;
+            m_hue = (int)(m_hueStartingAngle + ((float)sec_of_day / (float)86400) * 255) % 255;
             m_color = CHSV(m_hue, 255, 255);
         }
 
@@ -53,6 +53,7 @@ namespace siebenuhr_core
 
     void ColorWheelRenderer::setColor(const CRGB& color)
     {
-        m_color = color;
+        CHSV color_hsv = rgb2hsv_approximate(current_color);
+        m_hueStartingAngle = color_hsv.hue;
     }
 }
