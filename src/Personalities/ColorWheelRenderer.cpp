@@ -6,9 +6,8 @@
 namespace siebenuhr_core
 {
     ColorWheelRenderer::ColorWheelRenderer(const CRGB& color)
-    : m_color(color) 
     {
-        
+        setColor(color);
     }
 
     void ColorWheelRenderer::initialize(Glyph** glyphs, int numGlyphs)
