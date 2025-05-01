@@ -18,6 +18,8 @@ namespace siebenuhr_core
         void setColor(const CRGB& color) override;
         CRGB getColor() const override { return m_color; }
 
+        const char* getName() const override { return "FixedColor"; }
+
     private:
         CRGB m_color;
     };

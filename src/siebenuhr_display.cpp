@@ -154,11 +154,13 @@ namespace siebenuhr_core
 
     bool Display::setRenderer(std::unique_ptr<IDisplayRenderer> renderer)
     {
-        logMessage(LOG_LEVEL_INFO, "Changing display renderer...");
+        if (renderer == nullptr) {
+            return false;
+        }
+
         m_renderer = std::move(renderer);
         if (m_renderer)
         {
-            logMessage(LOG_LEVEL_INFO, "Initializing new renderer...");
             m_renderer->initialize(m_glyphs, m_numGlyphs);
             m_renderer->setText(m_text);
             logMessage(LOG_LEVEL_INFO, "Renderer initialized successfully");
@@ -211,33 +213,28 @@ namespace siebenuhr_core
 
     std::unique_ptr<IDisplayRenderer> Display::createRenderer(PersonalityType personality, const CRGB& defaultColor)
     {
-        logMessage(LOG_LEVEL_INFO, "Creating new renderer for personality type: %d", static_cast<int>(personality));
-        
         std::unique_ptr<IDisplayRenderer> renderer;
         switch (personality)
         {
             case PersonalityType::PERSONALITY_SOLIDCOLOR:
                 renderer = std::unique_ptr<IDisplayRenderer>(new FixedColorRenderer(defaultColor));
-                logMessage(LOG_LEVEL_INFO, "Created SolidColor renderer with default color: R=%d, G=%d, B=%d", 
-                    defaultColor.r, defaultColor.g, defaultColor.b);
                 break;
             case PersonalityType::PERSONALITY_COLORWHEEL:
                 renderer = std::unique_ptr<IDisplayRenderer>(new ColorWheelRenderer(defaultColor));
-                logMessage(LOG_LEVEL_INFO, "Created ColorWheel renderer");
                 break;
             case PersonalityType::PERSONALITY_RAINBOW:
                 renderer = std::unique_ptr<IDisplayRenderer>(new RainbowRenderer());
-                logMessage(LOG_LEVEL_INFO, "Created Rainbow renderer");
                 break;
             case PersonalityType::PERSONALITY_MOSAIK:
                 renderer = std::unique_ptr<IDisplayRenderer>(new MosaikRenderer());
-                logMessage(LOG_LEVEL_INFO, "Created Rainbow renderer");
                 break;
             default:
-                logMessage(LOG_LEVEL_WARN, "Unknown personality type %d, defaulting to solid color", static_cast<int>(personality));
-                renderer = std::unique_ptr<IDisplayRenderer>(new FixedColorRenderer(defaultColor));
-                break;
+                logMessage(LOG_LEVEL_WARN, "Unknown personality type %d.", static_cast<int>(personality));
+                return nullptr;
         }
+
+        logMessage(LOG_LEVEL_INFO, "Created %s renderer for personality type: %d", renderer->getName(), static_cast<int>(personality));
+
         return renderer;
     }
 
@@ -249,12 +246,6 @@ namespace siebenuhr_core
             {
                 logMessage(LOG_LEVEL_INFO, "Personality already set to %d", static_cast<int>(personality));
                 return;
-            }
-
-            if (m_renderer->supportsColor())
-            {
-                m_currentColor = m_renderer->getColor();
-                logMessage(LOG_LEVEL_INFO, "Preserving current color: R=%d, G=%d, B=%d", m_currentColor.r, m_currentColor.g, m_currentColor.b);
             }
         }
 

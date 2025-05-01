@@ -33,6 +33,8 @@ namespace siebenuhr_core
         virtual void setColor(const CRGB& color) {}
         virtual CRGB getColor() const { return CRGB::Black; }
 
+        virtual const char* getName() const = 0;
+
         Glyph** m_glyphs = nullptr;
         int m_numGlyphs = 0;
         

@@ -15,6 +15,8 @@ namespace siebenuhr_core
         // Color-related methods
         bool supportsColor() const override { return false; } // Mosaik has its own color logic
 
+        const char* getName() const override { return "Mosaik"; }
+
     private:
         uint8_t m_hue = 0;
         unsigned long m_lastUpdateTime = 0;

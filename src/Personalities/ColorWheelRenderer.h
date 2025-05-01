@@ -15,6 +15,8 @@ namespace siebenuhr_core
         void setColor(const CRGB& color) override;
         CRGB getColor() const override { return CHSV(m_hueStartingAngle, 255, 255); }
 
+        const char* getName() const override { return "ColorWheel"; }
+
     private:
         uint8_t m_hue = 0;
         uint8_t m_hueStartingAngle = 0;
