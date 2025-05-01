@@ -13,7 +13,7 @@ namespace siebenuhr_core
         void update(unsigned long currentMillis, int hours, int minutes) override;
 
         // Color-related methods
-        bool supportsColor() const override { return false; } // Rainbow has its own color logic
+        bool supportsColor() const override { return false; } // Mosaik has its own color logic
 
     private:
         uint8_t m_hue = 0;
