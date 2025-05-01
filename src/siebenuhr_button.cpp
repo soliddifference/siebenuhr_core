@@ -2,57 +2,55 @@
 
 namespace siebenuhr_core
 {
-    UIButton::UIButton(uint8_t buttonPin)
+    UIButton::UIButton(uint8_t buttonPin, uint8_t ledPin)
     {
-        _bCurrentState = false;
-        _nButtonPin = buttonPin;
-        _nButtonStateChangeTime = millis();
-        _nUpdateCounter = 999;
+        m_buttonPin = buttonPin;
+        m_ledPin = ledPin;
 
-        pinMode(constants::LED2_PIN, OUTPUT);
-        pinMode(_nButtonPin, INPUT);
-    }
-
-    void UIButton::registerCallbacks(void (*callbackFncButton)(void))
-    {
-        attachInterrupt(digitalPinToInterrupt(this->_nButtonPin), callbackFncButton, CHANGE);
+        pinMode(m_ledPin, OUTPUT);
+        pinMode(m_buttonPin, INPUT_PULLUP); 
     }
 
     void UIButton::update()
     {
-        _nUpdateCounter++;
-        if (isPressed()) {
-            digitalWrite(constants::LED2_PIN, HIGH);
-        } else {
-            digitalWrite(constants::LED2_PIN, LOW);
+        int buttonReading = digitalRead(m_buttonPin);
+        if (buttonReading != m_lastState) 
+        { 
+            m_lastDebounceTime = millis(); 
         }
-    }
 
-    void IRAM_ATTR UIButton::callbackButton()
-    {
-        _bCurrentState = digitalRead(_nButtonPin); // LOW = pressed & HIGH = not pressed, because internal pull-up resistor is enabled
-        _nUpdateCounter = 0;
-        _nButtonStateChangeTime = millis();
+        m_pressedEvent = false;
+        if ((millis() - m_lastDebounceTime) > constants::BUTTON_DEBOUNCE_DELAY) {
+            if (buttonReading != m_state) {
+                m_state = buttonReading;
+                if (m_state == LOW) { 
+                    m_pressedEvent = true;
+                }
+            }
+        }
+        m_lastState = buttonReading;
+
+        if (isPressed()) {
+            digitalWrite(m_ledPin, HIGH);
+        } else {
+            digitalWrite(m_ledPin, LOW);
+        }
     }
 
     bool UIButton::getState()
     {
-        return _bCurrentState;
+        return m_pressedEvent;
     }
 
-    bool UIButton::isPressed(int countThreshold)
+    bool UIButton::isPressed()
     {
-        return (getState() && _nUpdateCounter <= countThreshold);
+        // return (getState() && _nUpdateCounter <= countThreshold);
+        return getState();
     }
 
-    bool UIButton::isReleased(int countThreshold)
+    bool UIButton::isReleased()
     {
-        return (!getState() && _nUpdateCounter <= countThreshold);
-    }
-
-    int UIButton::getTimeSinceStateChange()
-    {
-        return millis() - _nButtonStateChangeTime;
-    }
-    
+        // return (!getState() && _nUpdateCounter <= countThreshold);
+        return !getState();
+    }    
 }

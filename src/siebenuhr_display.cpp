@@ -181,6 +181,7 @@ namespace siebenuhr_core
     {
         m_notificationText = text;
         m_notificationDuration = duration;
+        logMessage(LOG_LEVEL_INFO, "Notification set: %s", text.c_str());
     }
 
     void Display::setColor(const CRGB& color, int steps)
@@ -262,6 +263,21 @@ namespace siebenuhr_core
         {
             m_currentPersonality = personality;
         }
+    }
+
+    void Display::selectAdjacentPersonality(int direction)
+    {
+        // Get the current personality index
+        int currentIndex = static_cast<int>(m_currentPersonality);
+        
+        // Calculate new index with wrapping
+        int numPersonalities = static_cast<int>(PersonalityType::PERSONALITY_END);
+        int newIndex = (currentIndex + direction + numPersonalities) % numPersonalities;
+        
+        // Set the new personality
+        setPersonality(static_cast<PersonalityType>(newIndex));
+        
+        logMessage(LOG_LEVEL_INFO, "Selected %s personality: %d", direction > 0 ? "next" : "previous", newIndex);
     }
 
     void Display::update() 

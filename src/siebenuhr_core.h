@@ -25,6 +25,9 @@ namespace siebenuhr_core
         constexpr int ROT_ENC_B_PIN = 27;
         constexpr int ROT_ENC_BUTTON_PIN = 18;
 
+        constexpr int BUTTON_DEBOUNCE_DELAY = 50;    // debounce time; increase if bouncing seen
+
+
         // default clock setting
         constexpr int GlyphCount = 4;
         constexpr int SegmentCount = 7;
@@ -47,11 +50,18 @@ namespace siebenuhr_core
     }
 
     enum PersonalityType {
-        PERSONALITY_SOLIDCOLOR,
+        PERSONALITY_SOLIDCOLOR = 0,
         PERSONALITY_COLORWHEEL,
         PERSONALITY_RAINBOW,
-        PERSONALITY_MOSAIK
+        PERSONALITY_MOSAIK,
+        PERSONALITY_END
     };
+
+    // struct PersonalityMenu_t {
+    //     PersonalityType type;
+    //     String name;
+    //     String notification;
+    // };
 
     template <typename T>
     T clamp(T value, T minValue, T maxValue) 

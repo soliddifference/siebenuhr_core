@@ -46,6 +46,8 @@ namespace siebenuhr_core
         int getBrightness();
 
         void setPersonality(PersonalityType personality);
+        PersonalityType getCurrentPersonality() const { return m_currentPersonality; }
+        void selectAdjacentPersonality(int direction);
 
     private:
         Display();
