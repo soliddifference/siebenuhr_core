@@ -20,20 +20,20 @@ namespace siebenuhr_core {
         long getPosition();
         long getPositionDiff();
 
-        bool isButtonPressed(int countThreshold=1);
-        bool isButtonReleased(int countThreshold=1);
+        bool isButtonPressed();
+        bool isButtonReleased();
         long getButtonPressTime();
         
         static void IRAM_ATTR handleEncoderInterrupt();
         static void IRAM_ATTR handleButtonInterrupt();
 
     private:
-        bool _bButtonPressedState;
-        bool _bButtonPrevPressedState;
-        long _nButtonPressedTime; 
-        long _nEncoderPosition;
-        long _nEncoderPositionDiff;
-        static AiEsp32RotaryEncoder *_pRotaryEncoder;
+        bool m_buttonPressedState;
+        bool m_buttonPrevPressedState;
+        long m_buttonPressedTime; 
+        long m_encoderPosition;
+        long m_encoderPositionDiff;
+        static AiEsp32RotaryEncoder *m_rotaryEncoder;
     };
 
 }

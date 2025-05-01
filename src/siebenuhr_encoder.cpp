@@ -5,85 +5,85 @@ namespace siebenuhr_core
 
     #define ROTARY_ENCODER_STEPS 4
 
-    AiEsp32RotaryEncoder* UIKnob::_pRotaryEncoder = nullptr;
+    AiEsp32RotaryEncoder* UIKnob::m_rotaryEncoder = nullptr;
 
     void IRAM_ATTR UIKnob::handleEncoderInterrupt() {
-        _pRotaryEncoder->readEncoder_ISR();
+        m_rotaryEncoder->readEncoder_ISR();
     }
 
     void IRAM_ATTR UIKnob::handleButtonInterrupt() {
-        _pRotaryEncoder->readButton_ISR();
+        m_rotaryEncoder->readButton_ISR();
     }
 
     UIKnob::UIKnob(uint8_t encoderPinA, uint8_t encoderPinB, uint8_t buttonPin) 
     {
-        _pRotaryEncoder = new AiEsp32RotaryEncoder(encoderPinA, encoderPinB, buttonPin, -1, ROTARY_ENCODER_STEPS);
-        _pRotaryEncoder->begin();
-        _pRotaryEncoder->setup(handleEncoderInterrupt, handleButtonInterrupt);
-        _pRotaryEncoder->setBoundaries(0, 255, false); //minValue, maxValue, circleValues true|false (when max go to min and vice versa)
-        _pRotaryEncoder->setAcceleration(250);
+        m_rotaryEncoder = new AiEsp32RotaryEncoder(encoderPinA, encoderPinB, buttonPin, -1, ROTARY_ENCODER_STEPS);
+        m_rotaryEncoder->begin();
+        m_rotaryEncoder->setup(handleEncoderInterrupt, handleButtonInterrupt);
+        m_rotaryEncoder->setBoundaries(0, 255, false); //minValue, maxValue, circleValues true|false (when max go to min and vice versa)
+        m_rotaryEncoder->setAcceleration(250);
 
-        _nEncoderPosition = 0;
-        _nEncoderPositionDiff = 0;
-        _bButtonPrevPressedState = false;
-        _nButtonPressedTime = 0; 
+        m_encoderPosition = 0;
+        m_encoderPositionDiff = 0;
+        m_buttonPrevPressedState = false;
+        m_buttonPressedTime = 0; 
     }
 
     UIKnob::~UIKnob() {
-    delete _pRotaryEncoder;
+    delete m_rotaryEncoder;
     }
 
     void UIKnob::update() {
-        _nEncoderPositionDiff = _pRotaryEncoder->encoderChanged();
-        _nEncoderPosition = _pRotaryEncoder->readEncoder();	
-        _bButtonPressedState = _pRotaryEncoder->isEncoderButtonDown();
+        m_encoderPositionDiff = m_rotaryEncoder->encoderChanged();
+        m_encoderPosition = m_rotaryEncoder->readEncoder();	
+        m_buttonPressedState = m_rotaryEncoder->isEncoderButtonDown();
 
         if (isButtonPressed()) {
             digitalWrite(constants::LED2_PIN, HIGH);
-            if (!_bButtonPrevPressedState) {
-                _bButtonPrevPressedState = true;
-                _nButtonPressedTime = millis();
+            if (!m_buttonPrevPressedState) {
+                m_buttonPrevPressedState = true;
+                m_buttonPressedTime = millis();
             }
         } else {
             digitalWrite(constants::LED2_PIN, LOW);
-            _bButtonPrevPressedState = false;
+            m_buttonPrevPressedState = false;
         }	
     }
 
     void UIKnob::setEncoderBoundaries(long minEncoderValue, long maxEncoderValue, long position, bool circleValues) {
-        _pRotaryEncoder->setBoundaries(minEncoderValue, maxEncoderValue, circleValues);
+        m_rotaryEncoder->setBoundaries(minEncoderValue, maxEncoderValue, circleValues);
         setPosition(position);
     }
 
     bool UIKnob::hasPositionChanged() {
-        return _nEncoderPositionDiff != 0;
+        return m_encoderPositionDiff != 0;
     }
 
     void UIKnob::setPosition(long position) {
-        _nEncoderPosition = position;
-        _nEncoderPositionDiff = 0;
-        _pRotaryEncoder->setEncoderValue(_nEncoderPosition);
+        m_encoderPosition = position;
+        m_encoderPositionDiff = 0;
+        m_rotaryEncoder->setEncoderValue(m_encoderPosition);
     }
 
     long UIKnob::getPosition() {
-        return _nEncoderPosition;
+        return m_encoderPosition;
     }
 
     long UIKnob::getPositionDiff() {
-        return _nEncoderPositionDiff;
+        return m_encoderPositionDiff;
     }
 
-    bool UIKnob::isButtonPressed(int countThreshold) {
-        return _bButtonPressedState;
+    bool UIKnob::isButtonPressed() {
+        return m_buttonPressedState;
     }
 
-    bool UIKnob::isButtonReleased(int countThreshold) {
-        return _pRotaryEncoder->isEncoderButtonClicked();
+    bool UIKnob::isButtonReleased() {
+        return m_rotaryEncoder->isEncoderButtonClicked();
     }
 
     long UIKnob::getButtonPressTime() {
         if (isButtonPressed()) {
-            return 	millis() - _nButtonPressedTime;
+            return 	millis() - m_buttonPressedTime;
         }
         return 0l;
     }
