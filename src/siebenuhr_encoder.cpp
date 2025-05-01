@@ -1,5 +1,3 @@
-#include <Arduino.h>
-
 #include "siebenuhr_encoder.h"
 
 namespace siebenuhr_core

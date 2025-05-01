@@ -21,6 +21,7 @@ namespace siebenuhr_core
     {
         if (false)
         {
+            // fast version for testing
             m_hue = (m_hue + 1) % 256;
             m_color = CHSV(m_hue, 255, 255);
         } 
@@ -53,7 +54,7 @@ namespace siebenuhr_core
 
     void ColorWheelRenderer::setColor(const CRGB& color)
     {
-        CHSV color_hsv = rgb2hsv_approximate(current_color);
+        CHSV color_hsv = rgb2hsv_approximate(color);
         m_hueStartingAngle = color_hsv.hue;
     }
 }
