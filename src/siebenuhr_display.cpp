@@ -53,7 +53,7 @@ namespace siebenuhr_core
         m_heartbeatEnabled = isEnabled;
         if (m_heartbeatEnabled)
         {
-            pinMode(constants::LED1_PIN, OUTPUT);
+            pinMode(constants::LED_HEARTBEAT_PIN, OUTPUT);
         }
     }
 
@@ -78,7 +78,7 @@ namespace siebenuhr_core
             // m_glyphs[i]->setEffect(new SnakeFX(m_numLEDs, m_numLEDsPerSegments));
         }
 
-		FastLED.addLeds<WS2812, constants::GLYPH_LED_PIN, GRB>(m_LEDs, m_numLEDs);      
+		FastLED.addLeds<WS2812, constants::LED_GLYPH_PIN, GRB>(m_LEDs, m_numLEDs);      
         FastLED.clear(true);
 
         m_lastUpdateMillis = millis();
@@ -296,7 +296,7 @@ namespace siebenuhr_core
         if (m_heartbeatEnabled && (currentMillis - m_lastHeartbeatTime >= m_heartbeatInterval)) {
             m_lastHeartbeatTime = currentMillis;
             m_heartbeatState = !m_heartbeatState;
-            digitalWrite(constants::GLYPH_LED_PIN, m_heartbeatState);
+            digitalWrite(constants::LED_HEARTBEAT_PIN, m_heartbeatState);
 
             // logMessage(LOG_LEVEL_INFO, "ø FrameTime: %f", m_avgComputionTime.getAverage());
         }

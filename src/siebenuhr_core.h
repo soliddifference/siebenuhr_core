@@ -10,10 +10,12 @@ namespace siebenuhr_core
     namespace constants 
     {
         // SolidDifference Board GPIO
-        constexpr int LED1_PIN = 22;
-        constexpr int LED2_PIN = 19;
-        constexpr int LED3_PIN = 23;
-        constexpr int GLYPH_LED_PIN = 21;
+        constexpr int LED2_PIN = 22; // next to the BH1750 sensor
+        constexpr int LED3_PIN = 19; // next to the INA219 sensor
+        constexpr int LED4_PIN = 23; // next to user button
+
+        constexpr int LED_HEARTBEAT_PIN = LED2_PIN;
+        constexpr int LED_GLYPH_PIN = 21;
 
         constexpr int USER_BUTTON_PIN = 33;
         constexpr int BOOT_BUTTON_PIN = 0;
