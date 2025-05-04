@@ -8,7 +8,9 @@ namespace siebenuhr_core
     public:
         ColorWheelRenderer(const CRGB& color);
         void initialize(Glyph** glyphs, int numGlyphs) override;
-        void update(unsigned long currentMillis, int hours, int minutes) override;
+        void update(unsigned long currentMillis) override;
+
+        void onGlyphChange(Glyph* glyph) override;
 
         // Color-related methods
         bool supportsColor() const override { return true; }
@@ -18,6 +20,8 @@ namespace siebenuhr_core
         const char* getName() const override { return "ColorWheel"; }
 
     private:
+        void calculateCurrentHueAndColor();
+        
         uint8_t m_hue = 0;
         uint8_t m_hueStartingAngle = 0;
         CRGB m_color;

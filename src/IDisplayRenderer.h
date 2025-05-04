@@ -14,7 +14,7 @@ namespace siebenuhr_core
         virtual ~IDisplayRenderer() = default;
 
         virtual void initialize(Glyph** glyphs, int numGlyphs) = 0;
-        virtual void update(unsigned long currentMillis, int hours, int minutes) = 0;
+        virtual void update(unsigned long currentMillis) = 0;
 
         virtual void setText(const std::string& text)
         {
@@ -34,6 +34,9 @@ namespace siebenuhr_core
         virtual CRGB getColor() const { return CRGB::Black; }
 
         virtual const char* getName() const = 0;
+
+        // Called when a glyph's state changes (e.g., ASCII value changes)
+        virtual void onGlyphChange(Glyph* glyph) {}
 
         Glyph** m_glyphs = nullptr;
         int m_numGlyphs = 0;

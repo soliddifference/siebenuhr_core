@@ -6,14 +6,12 @@
 
 namespace siebenuhr_core
 {
-    class FixedColorRenderer : public IDisplayRenderer
+    class GlitterRenderer : public IDisplayRenderer
     {
     public:
-        FixedColorRenderer(const CRGB& color);
+        GlitterRenderer(const CRGB& color);
         void initialize(Glyph** glyphs, int numGlyphs) override;
         void update(unsigned long currentMillis) override;
-
-        void onGlyphChange(Glyph* glyph) override;
 
         // Color-related methods
         bool supportsColor() const override { return true; }

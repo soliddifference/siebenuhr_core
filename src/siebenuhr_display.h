@@ -16,11 +16,6 @@
 
 namespace siebenuhr_core
 {
-    enum ClockType {
-        CLOCK_TYPE_REGULAR = 0,
-        CLOCK_TYPE_MINI
-    };
-
     class Display 
     {
     public:
@@ -40,14 +35,22 @@ namespace siebenuhr_core
         void setBrightness(int value, bool saveToEEPROM = true);
         void setText(const std::string& text);
         void setColor(const CRGB& color, int steps = 0);
-        void setTime(int hours, int minutes);
         
+        void setTime(int hours, int minutes);
+        void getTime(int& hours, int& minutes);
+
         CRGB getColor();
         int getBrightness();
 
         void setPersonality(PersonalityType personality);
         PersonalityType getCurrentPersonality() const { return m_currentPersonality; }
         void selectAdjacentPersonality(int direction);
+        void setDefaultAnimationTime(unsigned long duration) { m_defaultAnimationTime = duration; }
+        void startLEDAnimation(int ledIndex, const CRGB& targetColor, unsigned long duration = 0);
+
+        // Get access to LED buffers for renderers
+        CRGB* getLEDBuffer() const { return m_LEDs; }
+        LEDAnimationState* getAnimationStates() const { return m_animationStates; }
 
     private:
         Display();
@@ -56,6 +59,7 @@ namespace siebenuhr_core
         void initializeGlyphs(int numSegments, int ledsPerSegment);
         bool setRenderer(std::unique_ptr<IDisplayRenderer> renderer);
         std::unique_ptr<IDisplayRenderer> createRenderer(PersonalityType personality, const CRGB& defaultColor);
+        void updateLEDAnimations(unsigned long currentMillis);
 
         static Display* s_instance;
 
@@ -78,7 +82,9 @@ namespace siebenuhr_core
         int m_numLEDsPerSegments;
         int m_numLEDs;
         Glyph** m_glyphs = nullptr;
-       	CRGB *m_LEDs = nullptr;
+       	CRGB *m_LEDs = nullptr;  // Current state (bound to FastLED)
+        LEDAnimationState* m_animationStates = nullptr;  // Per-LED animation states
+        unsigned long m_defaultAnimationTime = 0;  // Default animation time for new animations
 
         int m_hours = 0;
         int m_minutes = 0;  

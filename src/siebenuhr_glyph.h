@@ -149,16 +149,20 @@ namespace siebenuhr_core
         {0, 1, 0, 0, 0, 0, 0}
     }; // ASCII 126 - ~
 
+    class IDisplayRenderer;
+
     class Glyph
     {
     public:
         Glyph(int numSegments, int numLEDsPerSegments);
         ~Glyph() = default;
 
-        void attach(int glyphID, int glyphCount, CRGB *LEDs);
+        void attach(int glyphID, int glyphCount, CRGB *LEDs, LEDAnimationState* animationStates);
         void update(unsigned long currentMillis);
 
-        void setEffect(Effect *effect);
+        void setRenderer(IDisplayRenderer* renderer); // Set the renderer to notify on changes
+
+        // void setEffect(Effect *effect);
         void setAscii(char value);
         
         void resetLEDS();
@@ -180,21 +184,22 @@ namespace siebenuhr_core
             return getSegmentState(index);
         }
 
-        CRGB* getLEDs() const 
-        { 
-            return m_LEDs + m_glyphOffset; 
-        }
+        CRGB* getLEDs() const { return m_LEDs + m_glyphOffset; }
+        LEDAnimationState* getAnimationStates() const { return m_animationStates + m_glyphOffset; }
         
-        CRGB* getSegmentLEDs(int segmentIndex) const 
-        { 
+        CRGB* getSegmentLEDs(int segmentIndex) const { 
             int segmentOffset = segmentIndex * m_numLEDsPerSegments;
             return m_LEDs + m_glyphOffset + segmentOffset; 
+        }
+        
+        LEDAnimationState* getSegmentAnimationStates(int segmentIndex) const {
+            int segmentOffset = segmentIndex * m_numLEDsPerSegments;
+            return m_animationStates + m_glyphOffset + segmentOffset;
         }
         
         size_t getNumLEDs() const { return m_numLEDSPerGlyph; }
     
     private:
-        CRGB m_color;
         int m_curAscii = 0;
 
         int m_numSegments;
@@ -202,7 +207,12 @@ namespace siebenuhr_core
         int m_numLEDSPerGlyph;
         int m_glyphID = 0;
         int m_glyphOffset = 0;
+        
         CRGB *m_LEDs = nullptr;
-        Effect *m_effect = nullptr;        
+        LEDAnimationState *m_animationStates = nullptr;
+
+        IDisplayRenderer* m_renderer = nullptr;
+
+        // Effect *m_effect = nullptr;        
     };
 }
