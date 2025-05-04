@@ -220,6 +220,12 @@ namespace siebenuhr_core
         logMessage(LOG_LEVEL_INFO, "Time set: %02d:%02d", hours, minutes); 
     }    
 
+    void Display::getTime(int& hours, int& minutes)
+    {
+        hours = m_hours;
+        minutes = m_minutes;
+    }
+
     std::unique_ptr<IDisplayRenderer> Display::createRenderer(PersonalityType personality, const CRGB& defaultColor)
     {
         std::unique_ptr<IDisplayRenderer> renderer;
@@ -236,6 +242,9 @@ namespace siebenuhr_core
                 break;
             case PersonalityType::PERSONALITY_MOSAIK:
                 renderer = std::unique_ptr<IDisplayRenderer>(new MosaikRenderer());
+                break;
+            case PersonalityType::PERSONALITY_GLITTER:
+                renderer = std::unique_ptr<IDisplayRenderer>(new GlitterRenderer(defaultColor));
                 break;
             default:
                 logMessage(LOG_LEVEL_WARN, "Unknown personality type %d.", static_cast<int>(personality));
@@ -273,7 +282,7 @@ namespace siebenuhr_core
         // Calculate new index with wrapping
         int numPersonalities = static_cast<int>(PersonalityType::PERSONALITY_END);
         int newIndex = (currentIndex + direction + numPersonalities) % numPersonalities;
-        
+
         // Set the new personality
         setPersonality(static_cast<PersonalityType>(newIndex));
         
@@ -338,7 +347,7 @@ namespace siebenuhr_core
             if (m_renderer)
             {
                 // Update through the renderer
-                m_renderer->update(currentMillis, m_hours, m_minutes);
+                m_renderer->update(currentMillis);
 
                 // Update all active animations
                 updateLEDAnimations(currentMillis);

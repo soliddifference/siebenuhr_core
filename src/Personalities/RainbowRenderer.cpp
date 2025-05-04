@@ -1,4 +1,5 @@
 #include <Arduino.h>
+
 #include "RainbowRenderer.h"
 
 namespace siebenuhr_core
@@ -13,7 +14,7 @@ namespace siebenuhr_core
         m_numGlyphs = numGlyphs;
     }
 
-    void RainbowRenderer::update(unsigned long currentMillis, int hours, int minutes)
+    void RainbowRenderer::update(unsigned long currentMillis)
     {
         m_hue = (m_hue + 1) % 256;
 

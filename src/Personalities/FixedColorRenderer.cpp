@@ -32,12 +32,12 @@ namespace siebenuhr_core
                 segmentStates[j].startColor = segmentLEDs[j];
                 segmentStates[j].targetColor = glyph->getSegmentState(i) ? m_color : CRGB::Black;
                 segmentStates[j].startTime = millis();
-                segmentStates[j].duration = 200;
+                segmentStates[j].duration = glyph->getSegmentState(i) ? 250 : 100;
             }
         }
     }
 
-    void FixedColorRenderer::update(unsigned long currentMillis, int hours, int minutes)
+    void FixedColorRenderer::update(unsigned long currentMillis)
     {
         // nothing to do here as we trigger animation to onGlyphChange event 
         // and the animation is handled in the Display class

@@ -1,4 +1,5 @@
 #include <Arduino.h>
+
 #include "MosaikRenderer.h"
 
 namespace siebenuhr_core
@@ -13,7 +14,7 @@ namespace siebenuhr_core
         m_numGlyphs = numGlyphs;
     }
 
-    void MosaikRenderer::update(unsigned long currentMillis, int hours, int minutes)
+    void MosaikRenderer::update(unsigned long currentMillis)
     {
         m_hue = (m_hue + 1) % 256;
 

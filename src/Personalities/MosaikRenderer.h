@@ -10,7 +10,7 @@ namespace siebenuhr_core
     public:
         MosaikRenderer();
         void initialize(Glyph** glyphs, int numGlyphs) override;
-        void update(unsigned long currentMillis, int hours, int minutes) override;
+        void update(unsigned long currentMillis) override;
 
         // Color-related methods
         bool supportsColor() const override { return false; } // Mosaik has its own color logic

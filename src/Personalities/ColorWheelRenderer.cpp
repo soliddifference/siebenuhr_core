@@ -1,5 +1,6 @@
 #include <Arduino.h>
-#include <FastLED.h>
+
+#include "siebenuhr_display.h"
 
 #include "ColorWheelRenderer.h"
 
@@ -16,9 +17,12 @@ namespace siebenuhr_core
         m_numGlyphs = numGlyphs;
     }
 
-    void ColorWheelRenderer::update(unsigned long currentMillis, int hours, int minutes)
+    void ColorWheelRenderer::onGlyphChange(Glyph* glyph)
     {
-        if (false)
+        if (glyph == nullptr)
+            return;
+
+        if (true)
         {
             // fast version for testing
             m_hue = (m_hue + 1) % 256;
@@ -26,25 +30,52 @@ namespace siebenuhr_core
         } 
         else
         {
+            int hours, minutes;
+            Display::getInstance()->getTime(hours, minutes);
+
             // legacy version from siebenuhr v1.0
             int sec_of_day = hours * 3600 + minutes * 60;
             m_hue = (int)(m_hueStartingAngle + ((float)sec_of_day / (float)86400) * 255) % 255;
             m_color = CHSV(m_hue, 255, 255);
+
+            logMessage(LOG_LEVEL_INFO, "ColorWheelRenderer::onGlyphChange => hue: %d, color: %s", m_hue, m_color.toString().c_str());
         }
 
+        for (size_t i = 0; i < glyph->getNumSegments(); ++i) 
+        {
+            auto segmentLEDs = glyph->getSegmentLEDs(i);
+            auto segmentStates = glyph->getSegmentAnimationStates(i);
+
+            for (size_t j = 0; j < glyph->getLEDsPerSegment(); ++j)
+            {
+                segmentStates[j].isActive = true;
+                segmentStates[j].startColor = segmentLEDs[j];
+                segmentStates[j].targetColor = glyph->getSegmentState(i) ? m_color : CRGB::Black;
+                segmentStates[j].startTime = millis();
+                segmentStates[j].duration = glyph->getSegmentState(i) ? 250 : 100;
+            }
+        }
+    }
+
+    void ColorWheelRenderer::update(unsigned long currentMillis)
+    {
+        // as the color changes slowly over time the glyphs not in an active animation state will be updated to the current color
         for (size_t i = 0; i < m_numGlyphs; ++i) 
         {
             auto glyph = m_glyphs[i];
-            glyph->resetLEDS();
 
             for (size_t i = 0; i < glyph->getNumSegments(); ++i) 
             {
-                if (glyph->getSegmentState(i)) 
+                if (glyph->getSegmentState(i))
                 {
                     auto segmentLEDs = glyph->getSegmentLEDs(i);
-                    for (size_t j = 0; j < glyph->getLEDsPerSegment(); ++j)
+                    auto segmentAnimationStates = glyph->getSegmentAnimationStates(i);
+                    for (size_t j = 0; j < glyph->getLEDsPerSegment(); ++j) 
                     {
-                        segmentLEDs[j] = m_color;
+                        if (!segmentAnimationStates[j].isActive)
+                        {   
+                            segmentLEDs[j] = m_color;
+                        }
                     }
                 }
             }

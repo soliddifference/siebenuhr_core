@@ -61,6 +61,7 @@ namespace siebenuhr_core
         PERSONALITY_COLORWHEEL,
         PERSONALITY_RAINBOW,
         PERSONALITY_MOSAIK,
+        PERSONALITY_GLITTER,
         PERSONALITY_END
     };
 

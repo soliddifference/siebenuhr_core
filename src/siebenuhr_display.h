@@ -35,8 +35,10 @@ namespace siebenuhr_core
         void setBrightness(int value, bool saveToEEPROM = true);
         void setText(const std::string& text);
         void setColor(const CRGB& color, int steps = 0);
-        void setTime(int hours, int minutes);
         
+        void setTime(int hours, int minutes);
+        void getTime(int& hours, int& minutes);
+
         CRGB getColor();
         int getBrightness();
 
