@@ -4,11 +4,13 @@
 #include "siebenuhr_display.h"
 #include "siebenuhr_eeprom.h"
 
-#include "FX/snake.h"
+// #include "FX/snake.h"
+
 #include "Personalities/FixedColorRenderer.h"
 #include "Personalities/ColorWheelRenderer.h"
 #include "Personalities/RainbowRenderer.h"
 #include "Personalities/MosaikRenderer.h"
+#include "Personalities/GlitterRenderer.h"
 
 namespace siebenuhr_core
 {

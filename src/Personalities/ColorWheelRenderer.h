@@ -20,6 +20,8 @@ namespace siebenuhr_core
         const char* getName() const override { return "ColorWheel"; }
 
     private:
+        void calculateCurrentHueAndColor();
+        
         uint8_t m_hue = 0;
         uint8_t m_hueStartingAngle = 0;
         CRGB m_color;

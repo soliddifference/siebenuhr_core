@@ -17,29 +17,23 @@ namespace siebenuhr_core
         m_numGlyphs = numGlyphs;
     }
 
+    void ColorWheelRenderer::calculateCurrentHueAndColor()
+    {
+        int hours, minutes;
+        Display::getInstance()->getTime(hours, minutes);
+
+        // legacy version from siebenuhr v1.0
+        int sec_of_day = hours * 3600 + minutes * 60;
+        m_hue = (int)(m_hueStartingAngle + ((float)sec_of_day / (float)86400) * 255) % 255;
+        m_color = CHSV(m_hue, 255, 255);;
+    }
+
     void ColorWheelRenderer::onGlyphChange(Glyph* glyph)
     {
         if (glyph == nullptr)
             return;
 
-        if (true)
-        {
-            // fast version for testing
-            m_hue = (m_hue + 1) % 256;
-            m_color = CHSV(m_hue, 255, 255);
-        } 
-        else
-        {
-            int hours, minutes;
-            Display::getInstance()->getTime(hours, minutes);
-
-            // legacy version from siebenuhr v1.0
-            int sec_of_day = hours * 3600 + minutes * 60;
-            m_hue = (int)(m_hueStartingAngle + ((float)sec_of_day / (float)86400) * 255) % 255;
-            m_color = CHSV(m_hue, 255, 255);
-
-            logMessage(LOG_LEVEL_INFO, "ColorWheelRenderer::onGlyphChange => hue: %d, color: %s", m_hue, m_color.toString().c_str());
-        }
+        calculateCurrentHueAndColor();
 
         for (size_t i = 0; i < glyph->getNumSegments(); ++i) 
         {
@@ -60,6 +54,8 @@ namespace siebenuhr_core
     void ColorWheelRenderer::update(unsigned long currentMillis)
     {
         // as the color changes slowly over time the glyphs not in an active animation state will be updated to the current color
+        calculateCurrentHueAndColor();
+
         for (size_t i = 0; i < m_numGlyphs; ++i) 
         {
             auto glyph = m_glyphs[i];

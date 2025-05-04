@@ -14,6 +14,8 @@ namespace siebenuhr_core
     {
         m_glyphs = glyphs;
         m_numGlyphs = numGlyphs;
+
+        srand(millis());
     }
 
     void GlitterRenderer::update(unsigned long currentMillis)
@@ -21,29 +23,32 @@ namespace siebenuhr_core
         for (size_t i = 0; i < m_numGlyphs; ++i) 
         {
             auto glyph = m_glyphs[i];
-            glyph->resetLEDS();
-
-            size_t ledsPerSegment = glyph->getLEDsPerSegment();                    
 
             for (size_t segment = 0; segment < glyph->getNumSegments(); ++segment) 
             {
                 if (glyph->getSegmentState(segment)) 
                 {
-                    auto segmentStates = glyph->getSegmentAnimationStates(segment);
+                    auto segmentAnimationStates = glyph->getSegmentAnimationStates(segment);
                     for (size_t led = 0; led < glyph->getLEDsPerSegment(); ++led)
                     {
-                        if (random(100) < 10) 
+
+                        if (!segmentAnimationStates[led].isActive)
                         {
-                            segmentStates[led].isActive = true;
-                            segmentStates[led].startColor = m_color;
-                            segmentStates[led].targetColor = constants::BLACK;
-                            segmentStates[led].startTime = millis();
-                            segmentStates[led].duration = 2000;
+                            int randomValue = rand() % 100;
+                            if (randomValue < 1)
+                            {
+                                segmentAnimationStates[led].isActive = true;
+                                segmentAnimationStates[led].startColor = m_color;
+                                segmentAnimationStates[led].targetColor = constants::BLACK;
+                                segmentAnimationStates[led].startTime = millis();
+                                segmentAnimationStates[led].duration = 3000;
+                            }
                         }
+
                     }
                 }
             }
-        }    
+        }
     }
 
     void GlitterRenderer::setColor(const CRGB& color)

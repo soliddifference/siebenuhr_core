@@ -58,7 +58,7 @@ namespace siebenuhr_core
             m_renderer->onGlyphChange(this);
         }
 
-        logMessage(LOG_LEVEL_INFO, "glyph:setAscii => %d set char: %c", m_glyphID, (char)m_curAscii);
+        // logMessage(LOG_LEVEL_INFO, "glyph:setAscii => %d set char: %c", m_glyphID, (char)m_curAscii);
     }
 
     void Glyph::resetLEDS()
