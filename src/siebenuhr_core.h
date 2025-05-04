@@ -51,6 +51,11 @@ namespace siebenuhr_core
         constexpr int SensorReadInterval = 2000;
     }
 
+    enum ClockType {
+        CLOCK_TYPE_REGULAR = 0,
+        CLOCK_TYPE_MINI
+    };
+
     enum PersonalityType {
         PERSONALITY_SOLIDCOLOR = 0,
         PERSONALITY_COLORWHEEL,
@@ -59,11 +64,13 @@ namespace siebenuhr_core
         PERSONALITY_END
     };
 
-    // struct PersonalityMenu_t {
-    //     PersonalityType type;
-    //     String name;
-    //     String notification;
-    // };
+    struct LEDAnimationState {
+        CRGB startColor;
+        CRGB targetColor;
+        unsigned long startTime;
+        unsigned long duration;
+        bool isActive;
+    };
 
     template <typename T>
     T clamp(T value, T minValue, T maxValue) 

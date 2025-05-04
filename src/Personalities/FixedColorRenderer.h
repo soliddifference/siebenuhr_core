@@ -13,6 +13,8 @@ namespace siebenuhr_core
         void initialize(Glyph** glyphs, int numGlyphs) override;
         void update(unsigned long currentMillis, int hours, int minutes) override;
 
+        void onGlyphChange(Glyph* glyph) override;
+
         // Color-related methods
         bool supportsColor() const override { return true; }
         void setColor(const CRGB& color) override;

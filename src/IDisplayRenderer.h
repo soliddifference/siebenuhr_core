@@ -35,6 +35,9 @@ namespace siebenuhr_core
 
         virtual const char* getName() const = 0;
 
+        // Called when a glyph's state changes (e.g., ASCII value changes)
+        virtual void onGlyphChange(Glyph* glyph) {}
+
         Glyph** m_glyphs = nullptr;
         int m_numGlyphs = 0;
         
