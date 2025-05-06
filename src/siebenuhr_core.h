@@ -43,6 +43,10 @@ namespace siebenuhr_core
         // REGULAR CLOCK
         constexpr int RegularLedsPerSegment = 11;
 
+        // notification
+        constexpr CRGB NotificationColor = CRGB(255, 0, 0);
+        constexpr int NotificationBrightness = 255;
+
         // colors
         constexpr CRGB WHITE = CRGB(255, 255, 255);
         constexpr CRGB BLACK = CRGB(0, 0, 0);

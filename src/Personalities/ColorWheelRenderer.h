@@ -8,7 +8,7 @@ namespace siebenuhr_core
     public:
         ColorWheelRenderer(const CRGB& color);
         void initialize(Glyph** glyphs, int numGlyphs) override;
-        void update(unsigned long currentMillis) override;
+        void update() override;
 
         void onGlyphChange(Glyph* glyph) override;
 

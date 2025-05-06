@@ -14,7 +14,7 @@ namespace siebenuhr_core
         virtual ~IDisplayRenderer() = default;
 
         virtual void initialize(Glyph** glyphs, int numGlyphs) = 0;
-        virtual void update(unsigned long currentMillis) = 0;
+        virtual void update() = 0;
 
         virtual void setText(const std::string& text)
         {

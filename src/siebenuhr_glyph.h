@@ -186,6 +186,9 @@ namespace siebenuhr_core
 
         CRGB* getLEDs() const { return m_LEDs + m_glyphOffset; }
         LEDAnimationState* getAnimationStates() const { return m_animationStates + m_glyphOffset; }
+ 
+        CRGB* getGlobalLEDs() const { return m_LEDs; }
+        LEDAnimationState* getGlobalAnimationStates() const { return m_animationStates; }
         
         CRGB* getSegmentLEDs(int segmentIndex) const { 
             int segmentOffset = segmentIndex * m_numLEDsPerSegments;

@@ -48,7 +48,7 @@ namespace siebenuhr_core
 
     void Glyph::setAscii(char value) 
     {
-        if (m_curAscii == value) return;  // No change, no notification needed
+        // if (m_curAscii == value) return;  // No change, no notification needed
         
         m_curAscii = value;
         m_curAscii = clamp(m_curAscii, 0, 126);

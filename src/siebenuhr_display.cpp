@@ -69,19 +69,20 @@ namespace siebenuhr_core
         assert(m_numLEDsPerSegments > 0 && "LED count per segment must be greater 0.");
 
         m_numLEDs = m_numSegments * m_numLEDsPerSegments * m_numGlyphs;
+
+        // Allocate LED buffer
         m_LEDs = new CRGB[m_numLEDs];
-        m_animationStates = new LEDAnimationState[m_numLEDs];  // Allocate animation states
+        memset(m_LEDs, 0, m_numLEDs * sizeof(CRGB));
+
+        // Allocate and initialize animation states
+        m_animationStates = new LEDAnimationState[m_numLEDs]; 
+        memset(m_animationStates, 0, m_numLEDs * sizeof(LEDAnimationState));
 
         m_glyphs = new Glyph*[m_numGlyphs];
         for (size_t i = 0; i < m_numGlyphs; ++i) 
         {
             m_glyphs[i] = new Glyph(m_numSegments, m_numLEDsPerSegments);
             m_glyphs[i]->attach(i, m_numGlyphs, m_LEDs, m_animationStates);  // Attach to LED buffer and animation states
-        }
-
-        // Initialize animation states
-        for (int i = 0; i < m_numLEDs; ++i) {
-            m_animationStates[i].isActive = false;
         }
 
 		FastLED.addLeds<WS2812, constants::LED_GLYPH_PIN, GRB>(m_LEDs, m_numLEDs);      
@@ -175,7 +176,7 @@ namespace siebenuhr_core
                 m_glyphs[i]->setRenderer(m_renderer.get());
             }
             
-            logMessage(LOG_LEVEL_INFO, "Renderer initialized successfully");
+            logMessage(LOG_LEVEL_INFO, "%s renderer initialized successfully", m_renderer->getName());
             return true;
         }
 
@@ -186,15 +187,35 @@ namespace siebenuhr_core
     void Display::setText(const std::string& text)
     {
         m_text = text;
-        if (m_renderer)
+        if (!m_notificationActive && m_renderer)
             m_renderer->setText(text);
     }   
 
     void Display::setNotification(const std::string& text, int duration)
     {
-        m_notificationText = text;
-        m_notificationDuration = duration;
-        logMessage(LOG_LEVEL_INFO, "Notification set: %s", text.c_str());
+        // Store current state
+        m_previousBrightness = m_nBrightness;
+        m_previousRenderer = std::move(m_renderer);  // Store current renderer
+
+        // Create and set notification renderer
+        m_notificationRenderer = std::unique_ptr<IDisplayRenderer>(new FixedColorRenderer(m_notificationColor));
+        m_notificationRenderer->initialize(m_glyphs, m_numGlyphs);
+
+        // Set the notification renderer
+        if (setRenderer(std::move(m_notificationRenderer)))
+        {
+            m_renderer->setText(text);
+
+            // Set notification state
+            m_notificationDuration = duration;
+            m_notificationStartTime = millis();
+            m_notificationActive = true;
+
+            // Set notification display state
+            setBrightness(m_notificationBrightness, false);  // Don't save to EEPROM
+
+            logMessage(LOG_LEVEL_INFO, "Notification set: %s", text.c_str());
+        }
     }
 
     void Display::setColor(const CRGB& color, int steps)
@@ -303,8 +324,17 @@ namespace siebenuhr_core
         state.isActive = true;
     }
 
-    void Display::updateLEDAnimations(unsigned long currentMillis)
+    inline CRGB fadeColor(const CRGB& colorA, const CRGB& colorB, uint8_t t) {
+        return CRGB(
+            lerp8by8(colorA.r, colorB.r, t),
+            lerp8by8(colorA.g, colorB.g, t),
+            lerp8by8(colorA.b, colorB.b, t)
+        );
+    }
+
+    void Display::updateLEDAnimations()
     {
+        unsigned long currentMillis = millis();
         for (int i = 0; i < m_numLEDs; ++i)
         {
             LEDAnimationState& state = m_animationStates[i];
@@ -326,7 +356,7 @@ namespace siebenuhr_core
                 uint16_t blendFactor = (elapsed << 8) / state.duration;
                 
                 // Blend between start and target colors using the lower 8 bits directly
-                m_LEDs[i] = blend(state.startColor, state.targetColor, blendFactor);
+                m_LEDs[i] = fadeColor(state.startColor, state.targetColor, blendFactor);
             }
         }
     }
@@ -346,15 +376,28 @@ namespace siebenuhr_core
         }
         else
         {
-            if (m_renderer)
-            {
-                // Update through the renderer
-                m_renderer->update(currentMillis);
+            // Handle notification timing
+            if (m_notificationActive) {
+                if (currentMillis - m_notificationStartTime >= m_notificationDuration) {
+                    logMessage(LOG_LEVEL_INFO, "Notification ended...");
+                    // Restore previous state
+                    setBrightness(m_previousBrightness, false);
+                    if (setRenderer(std::move(m_previousRenderer)))
+                    {
+                        m_notificationActive = false;                       
+                    }                
 
-                // Update all active animations
-                updateLEDAnimations(currentMillis);
+                    logMessage(LOG_LEVEL_INFO, "...restored previous state");
+                }
             }
 
+            if (m_renderer)
+            {
+                // Only update through the renderer if no notification is active
+                m_renderer->update();
+            }
+
+            updateLEDAnimations();
             FastLED.show();
         }
 
@@ -363,8 +406,6 @@ namespace siebenuhr_core
             m_lastHeartbeatTime = currentMillis;
             m_heartbeatState = !m_heartbeatState;
             digitalWrite(constants::LED_HEARTBEAT_PIN, m_heartbeatState);
-
-            // logMessage(LOG_LEVEL_INFO, "ø FrameTime: %f", m_avgComputionTime.getAverage());
         }
 
         m_avgComputionTime.addValue(currentMillis - m_lastUpdateMillis);

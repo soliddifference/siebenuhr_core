@@ -14,7 +14,7 @@ namespace siebenuhr_core
         m_numGlyphs = numGlyphs;
     }
 
-    void RainbowRenderer::update(unsigned long currentMillis)
+    void RainbowRenderer::update()
     {
         m_hue = (m_hue + 1) % 256;
 

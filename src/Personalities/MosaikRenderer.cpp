@@ -14,7 +14,7 @@ namespace siebenuhr_core
         m_numGlyphs = numGlyphs;
     }
 
-    void MosaikRenderer::update(unsigned long currentMillis)
+    void MosaikRenderer::update()
     {
         m_hue = (m_hue + 1) % 256;
 

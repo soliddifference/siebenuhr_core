@@ -59,7 +59,7 @@ namespace siebenuhr_core
         void initializeGlyphs(int numSegments, int ledsPerSegment);
         bool setRenderer(std::unique_ptr<IDisplayRenderer> renderer);
         std::unique_ptr<IDisplayRenderer> createRenderer(PersonalityType personality, const CRGB& defaultColor);
-        void updateLEDAnimations(unsigned long currentMillis);
+        void updateLEDAnimations();
 
         static Display* s_instance;
 
@@ -91,8 +91,17 @@ namespace siebenuhr_core
         std::string m_text;
         int m_curTextPos = 0;
 
-        std::string m_notificationText = "";
+        // Notification
         int m_notificationDuration = 0; 
+        unsigned long m_notificationStartTime = 0;
+        bool m_notificationActive = false;
+        CRGB m_notificationColor = constants::NotificationColor;
+        int m_notificationBrightness = constants::NotificationBrightness;
+        std::unique_ptr<IDisplayRenderer> m_notificationRenderer;  // Dedicated renderer for notifications
+
+        // Previous state
+        std::unique_ptr<IDisplayRenderer> m_previousRenderer;  // Store previous renderer to restore after notification
+        int m_previousBrightness;  // Store previous brightness to restore after notification
 
         unsigned long m_lastUpdateMillis;
         RunningAverage m_avgComputionTime;

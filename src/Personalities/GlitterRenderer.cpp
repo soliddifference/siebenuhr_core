@@ -18,8 +18,9 @@ namespace siebenuhr_core
         srand(millis());
     }
 
-    void GlitterRenderer::update(unsigned long currentMillis)
+    void GlitterRenderer::update()
     {
+        unsigned long currentMillis = millis();
         for (size_t i = 0; i < m_numGlyphs; ++i) 
         {
             auto glyph = m_glyphs[i];
@@ -40,7 +41,7 @@ namespace siebenuhr_core
                                 segmentAnimationStates[led].isActive = true;
                                 segmentAnimationStates[led].startColor = m_color;
                                 segmentAnimationStates[led].targetColor = constants::BLACK;
-                                segmentAnimationStates[led].startTime = millis();
+                                segmentAnimationStates[led].startTime = currentMillis;
                                 segmentAnimationStates[led].duration = 3000;
                             }
                         }

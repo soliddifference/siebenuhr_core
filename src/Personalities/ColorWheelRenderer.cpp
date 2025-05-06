@@ -35,6 +35,7 @@ namespace siebenuhr_core
 
         calculateCurrentHueAndColor();
 
+        auto startTime = millis();
         for (size_t i = 0; i < glyph->getNumSegments(); ++i) 
         {
             auto segmentLEDs = glyph->getSegmentLEDs(i);
@@ -45,13 +46,13 @@ namespace siebenuhr_core
                 segmentStates[j].isActive = true;
                 segmentStates[j].startColor = segmentLEDs[j];
                 segmentStates[j].targetColor = glyph->getSegmentState(i) ? m_color : CRGB::Black;
-                segmentStates[j].startTime = millis();
+                segmentStates[j].startTime = startTime;
                 segmentStates[j].duration = glyph->getSegmentState(i) ? 250 : 100;
             }
         }
     }
 
-    void ColorWheelRenderer::update(unsigned long currentMillis)
+    void ColorWheelRenderer::update()
     {
         // as the color changes slowly over time the glyphs not in an active animation state will be updated to the current color
         calculateCurrentHueAndColor();
