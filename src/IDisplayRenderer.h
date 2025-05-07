@@ -16,6 +16,8 @@ namespace siebenuhr_core
         virtual void initialize(Glyph** glyphs, int numGlyphs) = 0;
         virtual void update() = 0;
 
+        // Text-related methods
+        virtual std::string getText() const { return m_text; }
         virtual void setText(const std::string& text)
         {
             m_text = text;
@@ -30,13 +32,20 @@ namespace siebenuhr_core
 
         // Color-related methods
         virtual bool supportsColor() const { return false; }
-        virtual void setColor(const CRGB& color) {}
         virtual CRGB getColor() const { return CRGB::Black; }
+        virtual void setColor(const CRGB& color) {}
 
         virtual const char* getName() const = 0;
 
         // Called when a glyph's state changes (e.g., ASCII value changes)
         virtual void onGlyphChange(Glyph* glyph) {}
+
+        void activate() {
+            for (int i = 0; i < m_numGlyphs; ++i)
+            {
+                m_glyphs[i]->setRenderer(this);
+            }
+        }
 
         Glyph** m_glyphs = nullptr;
         int m_numGlyphs = 0;

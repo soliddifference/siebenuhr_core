@@ -73,7 +73,7 @@ namespace siebenuhr_core
         bool m_heartbeatState = false;
 
         bool m_powerEnabled;
-        int m_nBrightness;
+        int m_brightness;
         CRGB m_currentColor;
 
         // Glyphs        
@@ -97,11 +97,8 @@ namespace siebenuhr_core
         bool m_notificationActive = false;
         CRGB m_notificationColor = constants::NotificationColor;
         int m_notificationBrightness = constants::NotificationBrightness;
+        int m_notificationPreviousBrightness = 0;
         std::unique_ptr<IDisplayRenderer> m_notificationRenderer;  // Dedicated renderer for notifications
-
-        // Previous state
-        std::unique_ptr<IDisplayRenderer> m_previousRenderer;  // Store previous renderer to restore after notification
-        int m_previousBrightness;  // Store previous brightness to restore after notification
 
         unsigned long m_lastUpdateMillis;
         RunningAverage m_avgComputionTime;

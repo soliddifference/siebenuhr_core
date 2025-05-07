@@ -27,6 +27,7 @@ namespace siebenuhr_core
     Display::Display()
         : m_avgComputionTime(100)
         , m_renderer(nullptr)
+        , m_notificationRenderer(new FixedColorRenderer(m_notificationColor))
     {
     }
 
@@ -44,8 +45,10 @@ namespace siebenuhr_core
         m_powerEnabled = true;
 
         // set saved configuration
-        m_nBrightness = Configuration::loadBrightness();
-        setBrightness(m_nBrightness);
+        setBrightness(Configuration::loadBrightness());
+
+        // Initialize notification renderer
+        m_notificationRenderer->initialize(m_glyphs, m_numGlyphs);
 
         setText("7uhr");
     }
@@ -148,15 +151,15 @@ namespace siebenuhr_core
             Configuration::saveBrightness(value);
         }
 
-        m_nBrightness = value;
-        FastLED.setBrightness(m_nBrightness);
+        m_brightness = value;
+        FastLED.setBrightness(m_brightness);
 
-        logMessage(LOG_LEVEL_INFO, "Display Brightness: %d", m_nBrightness);
+        logMessage(LOG_LEVEL_INFO, "Display Brightness: %d", m_brightness);
     }
 
     int Display::getBrightness() 
     {
-        return m_nBrightness;
+        return m_brightness;
     }
 
     bool Display::setRenderer(std::unique_ptr<IDisplayRenderer> renderer)
@@ -171,11 +174,9 @@ namespace siebenuhr_core
             m_renderer->initialize(m_glyphs, m_numGlyphs);
             m_renderer->setText(m_text);
             
-            // Set the renderer on each glyph
-            for (int i = 0; i < m_numGlyphs; ++i) {
-                m_glyphs[i]->setRenderer(m_renderer.get());
-            }
-            
+            // activate renderer to set the renderer on each glyph
+            m_renderer->activate();
+
             logMessage(LOG_LEVEL_INFO, "%s renderer initialized successfully", m_renderer->getName());
             return true;
         }
@@ -187,35 +188,29 @@ namespace siebenuhr_core
     void Display::setText(const std::string& text)
     {
         m_text = text;
-        if (!m_notificationActive && m_renderer)
+        if (m_renderer)
             m_renderer->setText(text);
     }   
 
     void Display::setNotification(const std::string& text, int duration)
     {
-        // Store current state
-        m_previousBrightness = m_nBrightness;
-        m_previousRenderer = std::move(m_renderer);  // Store current renderer
-
-        // Create and set notification renderer
-        m_notificationRenderer = std::unique_ptr<IDisplayRenderer>(new FixedColorRenderer(m_notificationColor));
-        m_notificationRenderer->initialize(m_glyphs, m_numGlyphs);
-
-        // Set the notification renderer
-        if (setRenderer(std::move(m_notificationRenderer)))
-        {
-            m_renderer->setText(text);
-
-            // Set notification state
-            m_notificationDuration = duration;
-            m_notificationStartTime = millis();
-            m_notificationActive = true;
-
-            // Set notification display state
-            setBrightness(m_notificationBrightness, false);  // Don't save to EEPROM
-
-            logMessage(LOG_LEVEL_INFO, "Notification set: %s", text.c_str());
+        if (!m_notificationRenderer) {
+            logMessage(LOG_LEVEL_WARN, "Notification renderer not initialized");
+            return;
         }
+
+        m_notificationRenderer->setText(text);
+        m_notificationPreviousBrightness = m_brightness;
+        m_notificationDuration = duration;
+        m_notificationStartTime = millis();
+        m_notificationActive = true;
+
+        m_notificationRenderer->activate();
+
+        // Set notification display state
+        setBrightness(m_notificationBrightness, false);
+
+        logMessage(LOG_LEVEL_INFO, "Notification set: %s", text.c_str());
     }
 
     void Display::setColor(const CRGB& color, int steps)
@@ -376,24 +371,24 @@ namespace siebenuhr_core
         }
         else
         {
-            // Handle notification timing
+            // Handle notification timing and display
             if (m_notificationActive) {
                 if (currentMillis - m_notificationStartTime >= m_notificationDuration) {
-                    logMessage(LOG_LEVEL_INFO, "Notification ended...");
-                    // Restore previous state
-                    setBrightness(m_previousBrightness, false);
-                    if (setRenderer(std::move(m_previousRenderer)))
-                    {
-                        m_notificationActive = false;                       
-                    }                
+                    // Notification ended, restore state and brightness
+                    setBrightness(m_notificationPreviousBrightness, false);
+                    m_notificationActive = false;
 
-                    logMessage(LOG_LEVEL_INFO, "...restored previous state");
+                    // activate renderer to set the renderer on each glyph
+                    m_renderer->activate();
+                    m_renderer->setText(m_text);
+
+                    logMessage(LOG_LEVEL_INFO, "Notification ended, restored normal display");
+                } else {
+                    // Update notification display
+                    m_notificationRenderer->update();
                 }
-            }
-
-            if (m_renderer)
-            {
-                // Only update through the renderer if no notification is active
+            } else if (m_renderer) {
+                // Update normal display
                 m_renderer->update();
             }
 
