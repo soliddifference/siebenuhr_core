@@ -24,5 +24,6 @@ namespace siebenuhr_core
 
     private:
         CRGB m_color;
+        bool m_forceUpdate = false;
     };
 }

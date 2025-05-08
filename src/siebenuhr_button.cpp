@@ -3,13 +3,13 @@
 /*
     How to use:
 
-    button.update();
+    ButtonState state = button.update();
 
-    if (button.getClickType() == ClickType::Single) {
+    if (state == ButtonState::SingleClick) {
         // trigger single-click action
     }
 
-    if (button.getClickType() == ClickType::Double) {
+    if (state == ButtonState::DoubleClick) {
         // trigger double-click action
     }
 
@@ -23,7 +23,6 @@
 
 */
 
-
 namespace siebenuhr_core
 {
     UIButton::UIButton(uint8_t buttonPin, uint8_t ledPin)
@@ -31,70 +30,85 @@ namespace siebenuhr_core
         m_buttonPin = buttonPin;
         m_ledPin = ledPin;
 
-        pinMode(m_ledPin, OUTPUT);
-        pinMode(m_buttonPin, INPUT_PULLUP); 
+        // pinMode(m_ledPin, OUTPUT);
+        pinMode(m_buttonPin, INPUT_PULLUP);
+        m_lastTransition = millis();
     }
 
-    void UIButton::update()
+    ButtonState UIButton::update()
     {
         int reading = digitalRead(m_buttonPin);
         unsigned long now = millis();
 
+        // Reset event flags
         m_pressedEvent = false;
         m_releasedEvent = false;
-        m_clickType = ClickType::None;
+        m_buttonState = ButtonState::Idle;
 
+        // Debounce logic
         if (reading != m_lastState) {
-            m_lastDebounceTime = now;
+            m_lastTransition = now;
         }
 
-        if ((now - m_lastDebounceTime) > DEBOUNCE_DELAY) {
+        // delayed event: if time since last single click is greater than double click threshold, fire single click event
+        if (m_lastSingleClickTime != 0 && (now - m_lastSingleClickTime) > DOUBLE_CLICK_TIME) {
+            m_lastSingleClickTime = 0;
+            m_buttonState = ButtonState::SingleClick;
+            // logMessage(LOG_LEVEL_INFO, "Button SINGLE-Click");
+        }
+
+        if (m_lastPressEventTime != 0) {
+            if ((now - m_lastPressEventTime) > LONG_PRESS_THRESHOLD) {
+                // logMessage(LOG_LEVEL_INFO, "Button long pressed");
+                m_buttonState = ButtonState::LongPress;
+            }
+        }
+
+        if ((now - m_lastTransition) > DEBOUNCE_DELAY) {
             if (reading != m_state) {
                 m_state = reading;
 
                 if (m_state == LOW) { // button down
-                    m_pressStartTime = now;
                     m_pressedEvent = true;
-
-                    if (m_waitingForSecondClick && (now - m_lastPressTime) <= DOUBLE_CLICK_TIME) {
-                        m_clickType = ClickType::Double;
-                        m_waitingForSecondClick = false;
-                    } else {
-                        m_lastPressTime = now;
-                        m_waitingForSecondClick = true;
-                    }
-
-                } else { // button up (release)
-                    m_lastReleaseTime = now;
+                    m_lastPressEventTime = now; // register time of press event to check for long press
+                } 
+                else 
+                { // button up (release)
                     m_releasedEvent = true;
+                    m_lastPressEventTime = 0; // reset press event time to avoid false long press detection
 
-                    if (m_waitingForSecondClick && (now - m_lastPressTime) > DOUBLE_CLICK_TIME) {
-                        m_clickType = ClickType::Single;
-                        m_waitingForSecondClick = false;
+                    if (m_buttonState != ButtonState::LongPress) {
+                        if (m_lastSingleClickTime == 0) {
+                            // delay firing single click-event, wait if double click is detected
+                            // logMessage(LOG_LEVEL_INFO, "check if next click is within DC threshold!");
+                            m_lastSingleClickTime = now;
+                        } else {
+                            // logMessage(LOG_LEVEL_INFO, "Button DOUBLE-Click");
+                            m_buttonState = ButtonState::DoubleClick;
+                            m_lastSingleClickTime = 0;
+                        }
+                    } else {
+                        // logMessage(LOG_LEVEL_INFO, "Button LONG-Click");
+                        m_buttonState = ButtonState::LongClick;
                     }
-
-                    m_longPressActive = false; // reset long press on release
                 }
-            }
-
-            // Long press check (held down)
-            if (m_state == LOW && (now - m_pressStartTime) >= LONG_PRESS_THRESHOLD) {
-                m_longPressActive = true;
             }
         }
 
         m_lastState = reading;
-        digitalWrite(m_ledPin, (m_state == LOW) ? HIGH : LOW);
+        // digitalWrite(m_ledPin, (m_state == LOW) ? HIGH : LOW);
+
+        return m_buttonState;
     }
 
-    ClickType UIButton::getClickType()
+    ButtonState UIButton::getState()
     {
-        return m_clickType;
+        return m_buttonState;
     }
 
     bool UIButton::isLongPress()
     {
-        return m_longPressActive;
+        return m_buttonState == ButtonState::LongPress;
     }
 
     bool UIButton::isPressed()

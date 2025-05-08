@@ -40,12 +40,34 @@ namespace siebenuhr_core
 
     void FixedColorRenderer::update()
     {
-        // nothing to do here as we trigger animation to onGlyphChange event 
-        // and the animation is handled in the Display class
+        if (m_forceUpdate)
+        {
+            for (size_t i = 0; i < m_numGlyphs; ++i) 
+            {
+                auto glyph = m_glyphs[i];
+                for (size_t i = 0; i < glyph->getNumSegments(); ++i) 
+                {
+                    if (glyph->getSegmentState(i))
+                    {
+                        auto segmentLEDs = glyph->getSegmentLEDs(i);
+                        auto segmentAnimationStates = glyph->getSegmentAnimationStates(i);
+                        for (size_t j = 0; j < glyph->getLEDsPerSegment(); ++j) 
+                        {
+                            if (!segmentAnimationStates[j].isActive)
+                            {   
+                                segmentLEDs[j] = m_color;
+                            }
+                        }
+                    }
+                }
+            }
+            m_forceUpdate = false;
+        }
     }
 
     void FixedColorRenderer::setColor(const CRGB& color)
     {
         m_color = color;
+        m_forceUpdate = true;
     }
 }

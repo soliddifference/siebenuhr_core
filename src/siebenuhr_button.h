@@ -4,10 +4,12 @@
 
 namespace siebenuhr_core {
 
-    enum class ClickType {
-        None,
-        Single,
-        Double
+    enum class ButtonState {
+        Idle = 0,
+        SingleClick,
+        DoubleClick,
+        LongClick,
+        LongPress
     };
 
     class UIButton {
@@ -15,35 +17,35 @@ namespace siebenuhr_core {
         UIButton(uint8_t buttonPin, uint8_t ledPin);
         ~UIButton() {}
 
-        void update();
-
-        ClickType getClickType();         // Single/Double
-        bool isLongPress();               // True as long as button is held beyond long press threshold
-        bool isPressed();                 // True only during press event
-        bool isReleased();               // True only during release event
+        ButtonState update();
+        ButtonState getState();
+        bool isLongPress();
+        bool isPressed();
+        bool isReleased();
 
     private:
         uint8_t m_buttonPin;
         uint8_t m_ledPin;
 
+        // Button state
         int m_state = HIGH;
         int m_lastState = HIGH;
-        unsigned long m_lastDebounceTime = 0;
+        unsigned long m_lastTransition = 0;
 
-        unsigned long m_pressStartTime = 0;
-        unsigned long m_lastReleaseTime = 0;
-        unsigned long m_lastPressTime = 0;
-
+        
+        // Event flags and timer
         bool m_pressedEvent = false;
         bool m_releasedEvent = false;
-        bool m_longPressActive = false;
-        bool m_waitingForSecondClick = false;
+        unsigned long m_lastPressEventTime = 0;
+        unsigned long m_lastSingleClickTime = 0;
 
-        ClickType m_clickType = ClickType::None;
+        
+        ButtonState m_buttonState = ButtonState::Idle;
 
-        static constexpr unsigned long DEBOUNCE_DELAY = constants::BUTTON_DEBOUNCE_DELAY;
-        static constexpr unsigned long DOUBLE_CLICK_TIME = 400;
-        static constexpr unsigned long LONG_PRESS_THRESHOLD = 700;
+        // Timing constants
+        static constexpr unsigned long DEBOUNCE_DELAY = 50;    // ms
+        static constexpr unsigned long DOUBLE_CLICK_TIME = 300;  // ms
+        static constexpr unsigned long LONG_PRESS_THRESHOLD = 500;  // ms
     };
 
 }
