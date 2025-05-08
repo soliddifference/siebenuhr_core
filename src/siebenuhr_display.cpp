@@ -167,15 +167,15 @@ namespace siebenuhr_core
         if (renderer == nullptr) {
             return false;
         }
-
+        m_renderer->deactivate();
         m_renderer = std::move(renderer);
         if (m_renderer)
         {
             m_renderer->initialize(m_glyphs, m_numGlyphs);
-            m_renderer->setText(m_text);
             
             // activate renderer to set the renderer on each glyph
             m_renderer->activate();
+            m_renderer->setText(m_text);
 
             logMessage(LOG_LEVEL_INFO, "%s renderer initialized successfully", m_renderer->getName());
             return true;

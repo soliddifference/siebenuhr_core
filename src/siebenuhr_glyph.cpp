@@ -36,29 +36,15 @@ namespace siebenuhr_core
         m_renderer->onGlyphChange(this);
     }
 
-    // void Glyph::setEffect(Effect *effect)
-    // {
-    //     m_effect = effect;
-    //     if (!m_effect)
-    //         return;
-
-    //     m_effect->initialize();
-    //     m_effect->attach(m_glyphOffset, m_LEDs);
-    // }
-
     void Glyph::setAscii(char value) 
     {
-        // if (m_curAscii == value) return;  // No change, no notification needed
-        
         m_curAscii = value;
         m_curAscii = clamp(m_curAscii, 0, 126);
 
         // Notify renderer of the change
-        if (m_renderer) {
+        if (m_renderer != nullptr) {
             m_renderer->onGlyphChange(this);
         }
-
-        // logMessage(LOG_LEVEL_INFO, "glyph:setAscii => %d set char: %c", m_glyphID, (char)m_curAscii);
     }
 
     void Glyph::resetLEDS()

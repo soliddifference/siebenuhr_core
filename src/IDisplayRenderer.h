@@ -47,6 +47,13 @@ namespace siebenuhr_core
             }
         }
 
+        void deactivate() {
+            for (int i = 0; i < m_numGlyphs; ++i)
+            {
+                m_glyphs[i]->setRenderer(nullptr);
+            }
+        }
+
         Glyph** m_glyphs = nullptr;
         int m_numGlyphs = 0;
         
