@@ -41,16 +41,22 @@ namespace siebenuhr_core
         virtual void onGlyphChange(Glyph* glyph) {}
 
         void activate() {
-            for (int i = 0; i < m_numGlyphs; ++i)
+            if (m_glyphs != nullptr) 
             {
-                m_glyphs[i]->setRenderer(this);
+                for (int i = 0; i < m_numGlyphs; ++i)
+                {
+                    m_glyphs[i]->setRenderer(this);
+                }
             }
         }
 
         void deactivate() {
-            for (int i = 0; i < m_numGlyphs; ++i)
+            if (m_glyphs != nullptr) 
             {
-                m_glyphs[i]->setRenderer(nullptr);
+                for (int i = 0; i < m_numGlyphs; ++i)
+                {
+                    m_glyphs[i]->setRenderer(nullptr);
+                }
             }
         }
 

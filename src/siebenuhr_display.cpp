@@ -167,8 +167,13 @@ namespace siebenuhr_core
         if (renderer == nullptr) {
             return false;
         }
-        m_renderer->deactivate();
+        
+        if (m_renderer)
+        {
+            m_renderer->deactivate();
+        }
         m_renderer = std::move(renderer);
+        
         if (m_renderer)
         {
             m_renderer->initialize(m_glyphs, m_numGlyphs);

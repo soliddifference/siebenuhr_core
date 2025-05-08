@@ -33,7 +33,9 @@ namespace siebenuhr_core
     void Glyph::setRenderer(IDisplayRenderer* renderer) 
     { 
         m_renderer = renderer; 
-        m_renderer->onGlyphChange(this);
+        if (m_renderer != nullptr) {
+            m_renderer->onGlyphChange(this);
+        }
     }
 
     void Glyph::setAscii(char value) 
