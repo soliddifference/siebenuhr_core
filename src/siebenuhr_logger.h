@@ -3,17 +3,6 @@
 #include <Arduino.h>
 #include "esp_log.h"
 
-// Log level definitions using enum class for type safety
-enum class CoreLogLevel {
-    NONE = 0,
-    ERROR = 1,
-    WARN = 2,
-    INFO = 3,
-    CONFIG = 4,
-    DEBUG = 5,
-    VERBOSE = 6
-};
-
 #define CORE_LOG_COLOR_BLACK "30"
 #define CORE_LOG_COLOR_RED "31"
 #define CORE_LOG_COLOR_GREEN "32"
@@ -33,6 +22,17 @@ enum class CoreLogLevel {
 #define CORE_LOG_COLOR_V CORE_LOG_COLOR(CORE_LOG_COLOR_CYAN)
 
 namespace siebenuhr_core {
+
+// Log level definitions using enum class for type safety
+enum class CoreLogLevel {
+    NONE = 0,
+    ERROR = 1,
+    WARN = 2,
+    INFO = 3,
+    CONFIG = 4,
+    DEBUG = 5,
+    VERBOSE = 6
+};
 
 class Logger {
 public:
