@@ -93,7 +93,7 @@ namespace siebenuhr_core
 
         m_lastUpdateMillis = millis();
 
-        logMessage(LOG_LEVEL_INFO, "Display Configuration: Glyphs=%d, Segments=%d, LEDs per Segment=%d, Total LEDs=%d", 
+        LOG_I("Display Configuration: Glyphs=%d, Segments=%d, LEDs per Segment=%d, Total LEDs=%d", 
             m_numGlyphs, m_numSegments, m_numLEDsPerSegments, m_numLEDs);
     }
 
@@ -154,7 +154,7 @@ namespace siebenuhr_core
         m_brightness = value;
         FastLED.setBrightness(m_brightness);
 
-        logMessage(LOG_LEVEL_INFO, "Display Brightness: %d", m_brightness);
+        LOG_I("Display Brightness: %d", m_brightness);
     }
 
     int Display::getBrightness() 
@@ -182,11 +182,11 @@ namespace siebenuhr_core
             m_renderer->activate();
             m_renderer->setText(m_text);
 
-            logMessage(LOG_LEVEL_INFO, "%s renderer initialized successfully", m_renderer->getName());
+            LOG_I("%s renderer initialized successfully", m_renderer->getName());
             return true;
         }
 
-        logMessage(LOG_LEVEL_WARN, "Failed to set renderer - renderer is null");
+        LOG_W("Failed to set renderer - renderer is null");
         return false;
     }
     
@@ -200,7 +200,7 @@ namespace siebenuhr_core
     void Display::setNotification(const std::string& text, int duration)
     {
         if (!m_notificationRenderer) {
-            logMessage(LOG_LEVEL_WARN, "Notification renderer not initialized");
+            LOG_W("Notification renderer not initialized");
             return;
         }
 
@@ -215,7 +215,7 @@ namespace siebenuhr_core
         // Set notification display state
         setBrightness(m_notificationBrightness, false);
 
-        logMessage(LOG_LEVEL_INFO, "Notification set: %s", text.c_str());
+        LOG_I("Notification set: %s", text.c_str());
     }
 
     void Display::setColor(const CRGB& color, int steps)
@@ -240,7 +240,7 @@ namespace siebenuhr_core
         snprintf(formatted_time, sizeof(formatted_time), "%02d%02d", hours, minutes);
         setText(std::string(formatted_time));
 
-        logMessage(LOG_LEVEL_INFO, "Time set: %02d:%02d", hours, minutes); 
+        LOG_I("Time set: %02d:%02d", hours, minutes); 
     }    
 
     void Display::getTime(int& hours, int& minutes)
@@ -270,11 +270,11 @@ namespace siebenuhr_core
                 renderer = std::unique_ptr<IDisplayRenderer>(new GlitterRenderer(defaultColor));
                 break;
             default:
-                logMessage(LOG_LEVEL_WARN, "Unknown personality type %d.", static_cast<int>(personality));
+                LOG_W("Unknown personality type %d.", static_cast<int>(personality));
                 return nullptr;
         }
 
-        logMessage(LOG_LEVEL_INFO, "Created %s renderer for personality type: %d", renderer->getName(), static_cast<int>(personality));
+        LOG_I("Created %s renderer for personality type: %d", renderer->getName(), static_cast<int>(personality));
 
         return renderer;
     }
@@ -285,7 +285,7 @@ namespace siebenuhr_core
         {
             if (m_currentPersonality == personality)
             {
-                logMessage(LOG_LEVEL_INFO, "Personality already set to %d", static_cast<int>(personality));
+                LOG_I("Personality already set to %d", static_cast<int>(personality));
                 return;
             }
         }
@@ -309,7 +309,7 @@ namespace siebenuhr_core
         // Set the new personality
         setPersonality(static_cast<PersonalityType>(newIndex));
         
-        logMessage(LOG_LEVEL_INFO, "Selected %s personality: %d", direction > 0 ? "next" : "previous", newIndex);
+        LOG_I("Selected %s personality: %d", direction > 0 ? "next" : "previous", newIndex);
     }
 
     void Display::startLEDAnimation(int ledIndex, const CRGB& targetColor, unsigned long duration)
@@ -387,7 +387,7 @@ namespace siebenuhr_core
                     m_renderer->activate();
                     m_renderer->setText(m_text);
 
-                    logMessage(LOG_LEVEL_INFO, "Notification ended, restored normal display");
+                    LOG_I("Notification ended, restored normal display");
                 } else {
                     // Update notification display
                     m_notificationRenderer->update();

@@ -18,7 +18,7 @@ namespace siebenuhr_core
     {
         if (LEDs == nullptr || animationStates == nullptr)
         {
-            logMessage(LOG_LEVEL_ERROR, "glyph:attach => Null LED or animation state pointer");
+            LOG_E("glyph:attach => Null LED or animation state pointer");
             return;
         }
     
@@ -27,7 +27,7 @@ namespace siebenuhr_core
         m_LEDs = LEDs;
         m_animationStates = animationStates;
     
-        logMessage(LOG_LEVEL_INFO, "Glyph %d attached at offset %d with %d LEDs.", m_glyphID, m_glyphOffset, m_numLEDSPerGlyph);
+        LOG_I("Glyph %d attached at offset %d with %d LEDs.", m_glyphID, m_glyphOffset, m_numLEDSPerGlyph);
     }
 
     void Glyph::setRenderer(IDisplayRenderer* renderer) 
