@@ -6,8 +6,6 @@
 #include "siebenuhr_encoder.h"
 #include "siebenuhr_button.h"
 
-#include "esp_log.h"
-
 namespace siebenuhr_core {
 
 class BaseController {
@@ -17,6 +15,10 @@ public:
     // Core functionality
     virtual void initialize(ClockType type);
     virtual void update();
+
+    void setLogLevel(int level) {
+        Logger::setLogLevel(static_cast<CoreLogLevel>(level));
+    }
     
     // Display control
     Display* getDisplay();

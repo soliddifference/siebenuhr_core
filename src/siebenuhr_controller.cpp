@@ -8,9 +8,6 @@ Adafruit_INA219 g_ina219; // Default address 0x40
 
 namespace siebenuhr_core {
 
-// Initialize logger with tag
-const char* const TAG = "🚀 Siebenuhr-Core";
-
 const BaseController::ControllerMenu_t BaseController::m_menu[BaseController::m_menuMaxEntries] = {
     {CONTROLLER_MENU::BRIGHTNESS, "Brightness", "Brit"},
     {CONTROLLER_MENU::HUE, "Hue", "COLr"},
@@ -18,6 +15,8 @@ const BaseController::ControllerMenu_t BaseController::m_menu[BaseController::m_
 
 void BaseController::initialize(ClockType type)
 {
+    Logger::init("🚀 siebenuhr.core");
+
     m_clockType = type;
 
     m_display = Display::getInstance();
