@@ -2,6 +2,7 @@
 
 #include <FastLED.h>
 #include "siebenuhr_core.h"
+#include "siebenuhr_color.h"
 #include "siebenuhr_display.h"
 #include "siebenuhr_encoder.h"
 #include "siebenuhr_button.h"
@@ -25,7 +26,7 @@ public:
     void setPower(bool powerEnabled);
     void setBrightness(int value);
     void setColor(float hue);
-    void setColor(int r, int g, int b);
+    void setColor(Color color);
     void setText(const std::string& text);
     void setNotification(const std::string& text, int duration);
     void setTime(int hours, int minutes);
@@ -76,17 +77,16 @@ protected:
     int m_minutes = 0;
 
     // Color state
-    float m_currentHueColor = -1;
+    Color m_currentColor;
     int m_currentBrightness = 128;
 
 private:
     void initializeControls();
     void handleUserInput();
+    void setMenu(CONTROLLER_MENU menu);
     void handleManualBrightnessChange();
     void handleManualHueChange();
     void readAndPrintPowerMonitoring();
-    static int calculateHue(const CRGB& color);
-    void setMenu(CONTROLLER_MENU menu);
 
     unsigned long m_lastSimultaneousClickTime = 0;
     static constexpr unsigned long SIMULTANEOUS_CLICK_THRESHOLD = 300;  // ms

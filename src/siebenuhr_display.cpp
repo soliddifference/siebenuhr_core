@@ -100,10 +100,13 @@ namespace siebenuhr_core
 
     void Display::setPowerEnabled(bool isEnabled) 
     {
-        m_powerEnabled = isEnabled;
-        if (!m_powerEnabled) 
+        if (m_powerEnabled != isEnabled)
         {
-            FastLED.clear(true);
+            m_powerEnabled = isEnabled;
+            if (!m_powerEnabled) 
+            {
+                FastLED.clear(true);
+            }
         }
     }
     

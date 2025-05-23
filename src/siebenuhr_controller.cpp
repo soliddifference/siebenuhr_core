@@ -24,7 +24,8 @@ void BaseController::initialize(ClockType type)
     {
         m_display->initialize(type, 4);
         m_display->setHeartbeatEnabled(false);
-        m_currentHueColor = calculateHue(m_display->getColor());
+
+        m_currentColor = Color::fromCRGB(m_display->getColor());
 
         Wire.begin(constants::SDA_PIN, constants::SCL_PIN);
         if (g_bh1750.begin(BH1750::CONTINUOUS_HIGH_RES_MODE)) 
@@ -72,33 +73,61 @@ Display* BaseController::getDisplay()
     return m_display;
 }
 
-int BaseController::calculateHue(const CRGB& color)
-{
-    // Convert RGB to HSV hue value (0-255)
-    if (color.r == color.g && color.g == color.b) {
-        return 0; // Grayscale has no hue
-    }
+// int BaseController::calculateHue(const CRGB& color)
+// {
+//     // Convert RGB to HSV hue value (0-255)
+//     if (color.r == color.g && color.g == color.b) {
+//         return 0; // Grayscale has no hue
+//     }
     
-    int max = color.r;
-    if (color.g > max) max = color.g;
-    if (color.b > max) max = color.b;
+//     int max = color.r;
+//     if (color.g > max) max = color.g;
+//     if (color.b > max) max = color.b;
     
-    int min = color.r;
-    if (color.g < min) min = color.g; 
-    if (color.b < min) min = color.b;
+//     int min = color.r;
+//     if (color.g < min) min = color.g; 
+//     if (color.b < min) min = color.b;
 
-    int hue = 0;
-    if (max == color.r) {
-        hue = 43 * (color.g - color.b) / (max - min);
-    } else if (max == color.g) {
-        hue = 85 + 43 * (color.b - color.r) / (max - min);
-    } else {
-        hue = 171 + 43 * (color.r - color.g) / (max - min);
-    }
+//     int hue = 0;
+//     if (max == color.r) {
+//         hue = 43 * (color.g - color.b) / (max - min);
+//     } else if (max == color.g) {
+//         hue = 85 + 43 * (color.b - color.r) / (max - min);
+//     } else {
+//         hue = 171 + 43 * (color.r - color.g) / (max - min);
+//     }
 
-    if (hue < 0) hue += 256;
-    return hue;
-}
+//     if (hue < 0) hue += 256;
+//     return hue;
+// }
+
+// CRGB BaseController::calculateRGB(int hue)
+// {
+//     // Clamp hue to 0–255
+//     hue = hue % 256;
+
+//     uint8_t region = hue / 43; // 0–5
+//     uint8_t remainder = (hue - (region * 43)) * 6;
+
+//     uint8_t p = 0;
+//     uint8_t q = 255 - (remainder * 255 / 256 / 255);  // Simplifies to: q = 255 - remainder
+//     uint8_t t = remainder;
+
+//     switch (region) {
+//         case 0:
+//             return CRGB(255, t, p);
+//         case 1:
+//             return CRGB(q, 255, p);
+//         case 2:
+//             return CRGB(p, 255, t);
+//         case 3:
+//             return CRGB(p, q, 255);
+//         case 4:
+//             return CRGB(t, p, 255);
+//         default: // case 5:
+//             return CRGB(255, p, q);
+//     }
+// }
 
 void BaseController::setMenu(CONTROLLER_MENU menu) {
     m_menuCurPos = menu;
@@ -114,9 +143,7 @@ void BaseController::setMenu(CONTROLLER_MENU menu) {
     }
     case CONTROLLER_MENU::HUE: 
     {
-        CRGB current_color = getDisplay()->getColor();
-        int current_hue = calculateHue(current_color);
-
+        int current_hue = (int)m_currentColor.getHue();
         m_encoder->setEncoderBoundaries(0, 255, current_hue, true);
         LOG_I("Switch to Option: %s, hue=%d", m_menu[static_cast<int>(m_menuCurPos)].name.c_str(), current_hue);
         break;
@@ -233,10 +260,9 @@ void BaseController::handleUserInput()
             {
                 if ( m_menuCurPos == CONTROLLER_MENU::HUE) 
                 {
-                    CRGB color = CHSV(m_currentHueColor, 255, 255);
-                    if (!sendColorToHomeAssistant(color))
+                    if (!sendColorToHomeAssistant(m_currentColor.getCRGB()))
                     {
-                        setColor(m_currentHueColor);
+                        setColor(m_currentColor);
                     }
                 }
             }                  
@@ -295,50 +321,41 @@ void BaseController::handleManualBrightnessChange()
 void BaseController::handleManualHueChange()
 {
     bool delayOnLongPress = false;
-    float hue = m_currentHueColor; 
 
     if (m_clockType == ClockType::CLOCK_TYPE_REGULAR)
     {
-        hue = (float)(m_encoder->getPosition() % 255);
+        float hue = (float)(m_encoder->getPosition() % 360);
+        m_currentColor.setHue(hue);
     }
     else
     {
         if (m_button1->isLongPress())
         {
-            hue -= .1;
+            m_currentColor.adjustHueBy(-.1f);
             delayOnLongPress = true;
         }
         else if (m_button2->isLongPress())
         {
-            hue += .1;
+            m_currentColor.adjustHueBy(.1f);
             delayOnLongPress = true;
         }
         if (m_button1->getState() == ButtonState::SingleClick || m_button1->getState() == ButtonState::DoubleClick)
         {
-            hue -= 5.0f;
+            m_currentColor.adjustHueBy(-2.5f);
         }
         else if (m_button2->getState() == ButtonState::SingleClick || m_button2->getState() == ButtonState::DoubleClick)
         {
-            hue += 5.0f;
-        }
-
-        if (hue < 0)
-        {
-            hue += 255.0f;
-        }
-        if (hue > 255.0f)
-        {
-            hue -= 255.0f;
+            m_currentColor.adjustHueBy(2.5f);
         }
     }
 
     if (delayOnLongPress)
     {
-        setColor(hue);
+        setColor(m_currentColor);
     }
-    else if (!sendColorToHomeAssistant(CHSV(((int)hue) % 255, 255, 255)))
+    else if (!sendColorToHomeAssistant(m_currentColor.getCRGB()))
     {
-        setColor(hue);
+        setColor(m_currentColor);
     }
 }
 
@@ -362,7 +379,7 @@ void BaseController::update()
 void BaseController::setPower(bool powerEnabled)
 {
     getDisplay()->setPowerEnabled(powerEnabled);
-    LOG_I("Power set to %s", powerEnabled ? "ON" : "OFF");
+    LOG_D("Power set to %s", powerEnabled ? "ON" : "OFF");
 }
 
 void BaseController::setBrightness(int value)
@@ -395,18 +412,20 @@ void BaseController::setBrightness(int value)
     }
 }
 
-void BaseController::setColor(int r, int g, int b)
+void BaseController::setColor(Color color)
 {
-    CRGB color = CRGB(r, g, b);
-    m_currentHueColor = calculateHue(color);
-    getDisplay()->setColor(color);
+    m_currentColor = color;
+
+    // LOG_I("Color set to %d %d %d (hue: %f)", r, g, b, m_currentHueColor);
+
+    getDisplay()->setColor(color.getCRGB());
 }
 
 void BaseController::setColor(float hue)
 {
-    m_currentHueColor = hue;
-    CRGB color = CHSV(hue, 255, 255);
-    getDisplay()->setColor(color);
+    Color m_currentColor = Color::fromHue(hue);
+
+    getDisplay()->setColor(m_currentColor.getCRGB());
 }
 
 void BaseController::setText(const std::string& text)
