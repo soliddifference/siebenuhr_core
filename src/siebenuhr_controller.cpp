@@ -24,6 +24,7 @@ void BaseController::initialize(ClockType type)
     {
         m_display->initialize(type, 4);
         m_display->setHeartbeatEnabled(false);
+        m_currentHueColor = calculateHue(m_display->getColor());
 
         Wire.begin(constants::SDA_PIN, constants::SCL_PIN);
         if (g_bh1750.begin(BH1750::CONTINUOUS_HIGH_RES_MODE)) 
@@ -123,7 +124,7 @@ void BaseController::setMenu(CONTROLLER_MENU menu) {
     }
 }
 
-void BaseController::handleMenuChange() 
+void BaseController::handleUserInput() 
 {
     // handle encoder changes
     if (m_encoder != nullptr)
@@ -179,24 +180,41 @@ void BaseController::handleMenuChange()
         }
         else if (m_clockType == ClockType::CLOCK_TYPE_MINI)
         {
-            // single click and long press actions for brightness and hue config
-            if (button1_state == ButtonState::SingleClick || button2_state == ButtonState::SingleClick) 
+            if (m_button1->isReleased() || m_button2->isReleased())
             {
-                switch (m_menuCurPos) {
-                case CONTROLLER_MENU::BRIGHTNESS: {
-                        getDisplay()->setNotification(" huE", 1500);
-                        setMenu(CONTROLLER_MENU::HUE);
-                        break;
-                    }
-                case CONTROLLER_MENU::HUE: {
-                        getDisplay()->setNotification("brit", 1500);
-                        setMenu(CONTROLLER_MENU::BRIGHTNESS);
-                        break;
-                    }
+                unsigned long button1_timesince = m_button1->getLastReleaseEventTime();
+                unsigned long button2_timesince = m_button2->getLastReleaseEventTime();
+                if (button1_timesince == 0 || button2_timesince == 0)
+                {
+                    LOG_D("Button not released: %d %d", button1_timesince, button2_timesince);
+                    return;
                 }
-            } 
-            // handle long press for brightness change
-            else if (m_button1->isLongPress() || m_button2->isLongPress())
+
+                long delta = abs((long)(button1_timesince - button2_timesince));
+                // make sure we don't have a false positive or trigger too often (can be due to the internal debounce of the buttons)
+                if (delta < BaseController::SIMULTANEOUS_CLICK_THRESHOLD && (millis() - m_lastSimultaneousClickTime) > BaseController::SIMULTANEOUS_CLICK_THRESHOLD)
+                {
+                    LOG_D("Simultaneous click detected: %dms (%d %d)", delta, button1_timesince, button2_timesince);
+                    m_lastSimultaneousClickTime = millis();
+
+                    switch (m_menuCurPos) {
+                    case CONTROLLER_MENU::BRIGHTNESS: {
+                            getDisplay()->setNotification(" huE", 1500);
+                            setMenu(CONTROLLER_MENU::HUE);
+                            break;
+                        }
+                    case CONTROLLER_MENU::HUE: {
+                            getDisplay()->setNotification("brit", 1500);
+                            setMenu(CONTROLLER_MENU::BRIGHTNESS);
+                            break;
+                        }
+                    }
+
+                }
+            }
+
+            // handle long press for brightness / hue change
+            if (m_button1->isLongPress() || m_button2->isLongPress() || button1_state != ButtonState::Idle || button2_state != ButtonState::Idle)
             {
                 switch (m_menuCurPos) {
                 case CONTROLLER_MENU::BRIGHTNESS: {
@@ -209,27 +227,29 @@ void BaseController::handleMenuChange()
                 }
                 }
             }
-            else if (button1_state == ButtonState::LongClick || button2_state == ButtonState::LongClick) 
+
+            // send color to home assistant (this is only needed for the mini clock)
+            if (button1_state == ButtonState::LongClick || button2_state == ButtonState::LongClick) 
             {
                 if ( m_menuCurPos == CONTROLLER_MENU::HUE) 
                 {
-                    CRGB color = CHSV(m_currentHue, 255, 255);
+                    CRGB color = CHSV(m_currentHueColor, 255, 255);
                     if (!sendColorToHomeAssistant(color))
                     {
-                        getDisplay()->setColor(color);
+                        setColor(m_currentHueColor);
                     }
-                    m_currentHue = -1;
                 }
             }                  
-            // change personality on double click
-            else if (button1_state == ButtonState::DoubleClick) 
-            {
-                getDisplay()->selectAdjacentPersonality(-1);
-            }
-            else if (button2_state == ButtonState::DoubleClick) 
-            {
-                getDisplay()->selectAdjacentPersonality(1);
-            }
+
+            // // change personality on double click
+            // else if (button1_state == ButtonState::DoubleClick) 
+            // {
+            //     getDisplay()->selectAdjacentPersonality(-1);
+            // }
+            // else if (button2_state == ButtonState::DoubleClick) 
+            // {
+            //     getDisplay()->selectAdjacentPersonality(1);
+            // }
         }
     }
 }
@@ -252,82 +272,79 @@ void BaseController::handleManualBrightnessChange()
         {
             brightness += 1;
         }
+        if (m_button1->getState() == ButtonState::SingleClick || m_button1->getState() == ButtonState::DoubleClick)
+        {
+            brightness -= 5;
+        }
+        else if (m_button2->getState() == ButtonState::SingleClick || m_button2->getState() == ButtonState::DoubleClick)
+        {
+            brightness += 5;
+        }
         brightness = clamp(brightness, 1L, 255L);
     }
 
-    if (m_autoBrightnessEnabled)
+    LOG_D("Brightness change: %d", brightness);
+
+    // send state change back to home assistant server
+    if (!sendBrightnessToHomeAssistant(brightness))
     {
-        // send state change back to home assistant server
-        if (!sendBrightnessToHomeAssistant(brightness))
-        {
-            m_currentBrightness = brightness;
-        }
-    }
-    else
-    {
-        if (brightness != getDisplay()->getBrightness())
-        {
-            // send state change back to home assistant server
-            if (!sendBrightnessToHomeAssistant(brightness))
-            {
-                getDisplay()->setBrightness(brightness);
-            }
-        }
+        setBrightness(brightness);
     }
 }
 
 void BaseController::handleManualHueChange()
 {
-    CRGB color = getDisplay()->getColor();
+    bool delayOnLongPress = false;
+    float hue = m_currentHueColor; 
+
     if (m_clockType == ClockType::CLOCK_TYPE_REGULAR)
     {
-        int hue = m_encoder->getPosition() % 255;
-        color = CHSV(hue, 255, 255);
+        hue = (float)(m_encoder->getPosition() % 255);
     }
     else
     {
-        // using float here for higher resolution
-        if (m_currentHue == -1) 
-        {
-            m_currentHue = calculateHue(getDisplay()->getColor());
-        }
-
         if (m_button1->isLongPress())
         {
-            m_currentHue -= .1;
-            if (m_currentHue < 0)
-            {
-                m_currentHue += 255.0f;
-            }
+            hue -= .1;
+            delayOnLongPress = true;
         }
         else if (m_button2->isLongPress())
         {
-            m_currentHue += .1;
-            if (m_currentHue > 255.0f)
-            {
-                m_currentHue -= 255.0f;
-            }
+            hue += .1;
+            delayOnLongPress = true;
         }
-        color = CHSV(((int)m_currentHue) % 255, 255, 255);
-        LOG_I("HUE CHANGE: %f", m_currentHue);
+        if (m_button1->getState() == ButtonState::SingleClick || m_button1->getState() == ButtonState::DoubleClick)
+        {
+            hue -= 5.0f;
+        }
+        else if (m_button2->getState() == ButtonState::SingleClick || m_button2->getState() == ButtonState::DoubleClick)
+        {
+            hue += 5.0f;
+        }
+
+        if (hue < 0)
+        {
+            hue += 255.0f;
+        }
+        if (hue > 255.0f)
+        {
+            hue -= 255.0f;
+        }
     }
 
-    if (m_clockType == ClockType::CLOCK_TYPE_REGULAR)
+    if (delayOnLongPress)
     {
-        if (!sendColorToHomeAssistant(color))
-        {
-            getDisplay()->setColor(color);
-        }
+        setColor(hue);
     }
-    else
+    else if (!sendColorToHomeAssistant(CHSV(((int)hue) % 255, 255, 255)))
     {
-        getDisplay()->setColor(color);
+        setColor(hue);
     }
 }
 
 void BaseController::update()
 {
-    handleMenuChange();
+    handleUserInput();
 
     if (m_autoBrightnessEnabled && m_isBH1750Initialized) 
     {
@@ -365,10 +382,10 @@ void BaseController::setBrightness(int value)
     {
         if (value != m_currentBrightness)
         {
-            getDisplay()->setBrightness(value);
-            m_currentBrightness = getDisplay()->getBrightness();
+            m_currentBrightness = getDisplay()->setBrightness(value);
 
-            if (m_menuCurPos == CONTROLLER_MENU::BRIGHTNESS)
+            // update encoder position if we are in brightness configuration mode
+            if (m_encoder != nullptr && m_menuCurPos == CONTROLLER_MENU::BRIGHTNESS)
             {
                 m_encoder->setPosition(m_currentBrightness);
             }
@@ -381,6 +398,14 @@ void BaseController::setBrightness(int value)
 void BaseController::setColor(int r, int g, int b)
 {
     CRGB color = CRGB(r, g, b);
+    m_currentHueColor = calculateHue(color);
+    getDisplay()->setColor(color);
+}
+
+void BaseController::setColor(float hue)
+{
+    m_currentHueColor = hue;
+    CRGB color = CHSV(hue, 255, 255);
     getDisplay()->setColor(color);
 }
 

@@ -32,7 +32,7 @@ namespace siebenuhr_core
 
         void setEnvLightLevel(float lux, int baseBrightness = 10, int maxBrightnessRange = 255);
 
-        void setBrightness(int value, bool saveToEEPROM = true);
+        int setBrightness(int value, bool saveToEEPROM = true);
         void setText(const std::string& text);
         void setColor(const CRGB& color, int steps = 0);
         
@@ -74,7 +74,7 @@ namespace siebenuhr_core
 
         bool m_powerEnabled;
         int m_brightness;
-        CRGB m_currentColor;
+        CRGB m_currentColor = CHSV(171, 255, 220);
 
         // Glyphs        
         int m_numGlyphs;

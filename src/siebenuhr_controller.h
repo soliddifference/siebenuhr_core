@@ -24,6 +24,7 @@ public:
     Display* getDisplay();
     void setPower(bool powerEnabled);
     void setBrightness(int value);
+    void setColor(float hue);
     void setColor(int r, int g, int b);
     void setText(const std::string& text);
     void setNotification(const std::string& text, int duration);
@@ -75,17 +76,20 @@ protected:
     int m_minutes = 0;
 
     // Color state
-    float m_currentHue = -1;
+    float m_currentHueColor = -1;
     int m_currentBrightness = 128;
 
 private:
     void initializeControls();
-    void handleMenuChange();
+    void handleUserInput();
     void handleManualBrightnessChange();
     void handleManualHueChange();
     void readAndPrintPowerMonitoring();
     static int calculateHue(const CRGB& color);
     void setMenu(CONTROLLER_MENU menu);
+
+    unsigned long m_lastSimultaneousClickTime = 0;
+    static constexpr unsigned long SIMULTANEOUS_CLICK_THRESHOLD = 300;  // ms
 };
 
 } // namespace siebenuhr_core 

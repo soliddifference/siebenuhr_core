@@ -70,11 +70,13 @@ namespace siebenuhr_core
 
                 if (m_state == LOW) { // button down
                     m_pressedEvent = true;
+                    m_lastReleaseEventTime = 0;
                     m_lastPressEventTime = now; // register time of press event to check for long press
                 } 
                 else 
                 { // button up (release)
                     m_releasedEvent = true;
+                    m_lastReleaseEventTime = now;
                     m_lastPressEventTime = 0; // reset press event time to avoid false long press detection
 
                     if (m_buttonState != ButtonState::LongPress) {
@@ -119,5 +121,10 @@ namespace siebenuhr_core
     bool UIButton::isReleased()
     {
         return m_releasedEvent;
+    }
+
+    unsigned long UIButton::getLastReleaseEventTime()
+    {
+        return m_lastReleaseEventTime;
     }
 }

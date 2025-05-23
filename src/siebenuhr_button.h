@@ -23,6 +23,8 @@ namespace siebenuhr_core {
         bool isPressed();
         bool isReleased();
 
+        unsigned long getLastReleaseEventTime();
+
     private:
         uint8_t m_buttonPin;
         uint8_t m_ledPin;
@@ -36,12 +38,14 @@ namespace siebenuhr_core {
         // Event flags and timer
         bool m_pressedEvent = false;
         bool m_releasedEvent = false;
+        unsigned long m_lastReleaseEventTime = 0;
         unsigned long m_lastPressEventTime = 0;
         unsigned long m_lastSingleClickTime = 0;
 
         
         ButtonState m_buttonState = ButtonState::Idle;
 
+    public:
         // Timing constants
         static constexpr unsigned long DEBOUNCE_DELAY = 50;    // ms
         static constexpr unsigned long DOUBLE_CLICK_TIME = 350;  // ms

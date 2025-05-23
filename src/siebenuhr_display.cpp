@@ -50,6 +50,7 @@ namespace siebenuhr_core
         // Initialize notification renderer
         m_notificationRenderer->initialize(m_glyphs, m_numGlyphs);
 
+        setColor(m_currentColor);
         setText("7uhr");
     }
 
@@ -143,7 +144,7 @@ namespace siebenuhr_core
         }
     }
 
-    void Display::setBrightness(int value, bool saveToEEPROM) 
+    int Display::setBrightness(int value, bool saveToEEPROM) 
     {
         value = clamp(value, 0, 255);
 
@@ -154,7 +155,8 @@ namespace siebenuhr_core
         m_brightness = value;
         FastLED.setBrightness(m_brightness);
 
-        LOG_I("Display Brightness: %d", m_brightness);
+        LOG_D("Display Brightness: %d", m_brightness);
+        return m_brightness;
     }
 
     int Display::getBrightness() 
@@ -221,7 +223,7 @@ namespace siebenuhr_core
     void Display::setColor(const CRGB& color, int steps)
     {
         m_currentColor = color;
-        if (m_renderer->supportsColor()) {
+        if (m_renderer != nullptr && m_renderer->supportsColor()) {
             m_renderer->setColor(color);
         }
     }
