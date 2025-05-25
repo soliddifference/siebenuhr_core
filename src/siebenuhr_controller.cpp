@@ -73,63 +73,8 @@ Display* BaseController::getDisplay()
     return m_display;
 }
 
-// int BaseController::calculateHue(const CRGB& color)
-// {
-//     // Convert RGB to HSV hue value (0-255)
-//     if (color.r == color.g && color.g == color.b) {
-//         return 0; // Grayscale has no hue
-//     }
-    
-//     int max = color.r;
-//     if (color.g > max) max = color.g;
-//     if (color.b > max) max = color.b;
-    
-//     int min = color.r;
-//     if (color.g < min) min = color.g; 
-//     if (color.b < min) min = color.b;
-
-//     int hue = 0;
-//     if (max == color.r) {
-//         hue = 43 * (color.g - color.b) / (max - min);
-//     } else if (max == color.g) {
-//         hue = 85 + 43 * (color.b - color.r) / (max - min);
-//     } else {
-//         hue = 171 + 43 * (color.r - color.g) / (max - min);
-//     }
-
-//     if (hue < 0) hue += 256;
-//     return hue;
-// }
-
-// CRGB BaseController::calculateRGB(int hue)
-// {
-//     // Clamp hue to 0–255
-//     hue = hue % 256;
-
-//     uint8_t region = hue / 43; // 0–5
-//     uint8_t remainder = (hue - (region * 43)) * 6;
-
-//     uint8_t p = 0;
-//     uint8_t q = 255 - (remainder * 255 / 256 / 255);  // Simplifies to: q = 255 - remainder
-//     uint8_t t = remainder;
-
-//     switch (region) {
-//         case 0:
-//             return CRGB(255, t, p);
-//         case 1:
-//             return CRGB(q, 255, p);
-//         case 2:
-//             return CRGB(p, 255, t);
-//         case 3:
-//             return CRGB(p, q, 255);
-//         case 4:
-//             return CRGB(t, p, 255);
-//         default: // case 5:
-//             return CRGB(255, p, q);
-//     }
-// }
-
-void BaseController::setMenu(CONTROLLER_MENU menu) {
+void BaseController::setMenu(CONTROLLER_MENU menu) 
+{
     m_menuCurPos = menu;
     m_menuPosLastTimeChange = millis();
    
@@ -240,8 +185,18 @@ void BaseController::handleUserInput()
                 }
             }
 
+            if (m_button1->isLongPress() && m_button2->isLongPress())
+            {
+                auto b1_press_time = millis() - m_button1->getLastPressEventTime();
+                auto b2_press_time = millis() - m_button2->getLastPressEventTime();
+                if (b1_press_time > RESET_HOLD_DURATION && b2_press_time > RESET_HOLD_DURATION) 
+                {
+                    handleLongPressReset();
+                }
+                return;
+            }
             // handle long press for brightness / hue change
-            if (m_button1->isLongPress() || m_button2->isLongPress() || button1_state != ButtonState::Idle || button2_state != ButtonState::Idle)
+            else if (m_button1->isLongPress() || m_button2->isLongPress() || button1_state != ButtonState::Idle || button2_state != ButtonState::Idle)
             {
                 switch (m_menuCurPos) {
                 case CONTROLLER_MENU::BRIGHTNESS: {

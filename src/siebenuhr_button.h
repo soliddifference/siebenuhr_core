@@ -23,6 +23,7 @@ namespace siebenuhr_core {
         bool isPressed();
         bool isReleased();
 
+        unsigned long getLastPressEventTime();
         unsigned long getLastReleaseEventTime();
 
     private:
@@ -41,7 +42,6 @@ namespace siebenuhr_core {
         unsigned long m_lastReleaseEventTime = 0;
         unsigned long m_lastPressEventTime = 0;
         unsigned long m_lastSingleClickTime = 0;
-
         
         ButtonState m_buttonState = ButtonState::Idle;
 

@@ -54,12 +54,12 @@ namespace siebenuhr_core
         if (m_lastSingleClickTime != 0 && (now - m_lastSingleClickTime) > DOUBLE_CLICK_TIME) {
             m_lastSingleClickTime = 0;
             m_buttonState = ButtonState::SingleClick;
-            // logMessage(LOG_LEVEL_INFO, "Button SINGLE-Click");
+            LOG_D("Button SINGLE-Click");
         }
 
         if (m_lastPressEventTime != 0) {
             if ((now - m_lastPressEventTime) > LONG_PRESS_THRESHOLD) {
-                // logMessage(LOG_LEVEL_INFO, "Button long pressed");
+                LOG_D("Button long pressed");
                 m_buttonState = ButtonState::LongPress;
             }
         }
@@ -121,6 +121,11 @@ namespace siebenuhr_core
     bool UIButton::isReleased()
     {
         return m_releasedEvent;
+    }
+
+    unsigned long UIButton::getLastPressEventTime()
+    {
+        return m_lastPressEventTime;
     }
 
     unsigned long UIButton::getLastReleaseEventTime()

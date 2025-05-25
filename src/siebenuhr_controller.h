@@ -90,7 +90,9 @@ private:
     void readAndPrintPowerMonitoring();
 
     unsigned long m_lastSimultaneousClickTime = 0;
+
     static constexpr unsigned long SIMULTANEOUS_CLICK_THRESHOLD = 300;  // ms
+    static constexpr unsigned long RESET_HOLD_DURATION = 5000;  // ms
 };
 
 } // namespace siebenuhr_core 
