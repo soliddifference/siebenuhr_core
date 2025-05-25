@@ -38,8 +38,9 @@ public:
 
 protected:
     // Virtual methods to be implemented by derived classes
-    virtual bool sendBrightnessToHomeAssistant(int brightness) = 0;
-    virtual bool sendColorToHomeAssistant(CRGB color) = 0;
+    virtual bool handleLongPressReset() { return false; };
+    virtual bool sendBrightnessToHomeAssistant(int brightness) { return false; };
+    virtual bool sendColorToHomeAssistant(CRGB color) { return false; };
 
     // Internal state
     Display* m_display = nullptr;
