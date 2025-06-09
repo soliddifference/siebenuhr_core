@@ -355,6 +355,7 @@ void BaseController::setBrightness(int value)
         if (value != m_currentBrightness)
         {
             m_currentBrightness = getDisplay()->setBrightness(value);
+            onBrightnessChange(value);
 
             // update encoder position if we are in brightness configuration mode
             if (m_encoder != nullptr && m_menuCurPos == CONTROLLER_MENU::BRIGHTNESS)
@@ -370,17 +371,15 @@ void BaseController::setBrightness(int value)
 void BaseController::setColor(Color color)
 {
     m_currentColor = color;
-
-    // LOG_I("Color set to %d %d %d (hue: %f)", r, g, b, m_currentHueColor);
-
-    getDisplay()->setColor(color.getCRGB());
+    getDisplay()->setColor(m_currentColor.getCRGB());
+    onColorChange(m_currentColor.getCRGB());
 }
 
 void BaseController::setColor(float hue)
 {
     Color m_currentColor = Color::fromHue(hue);
-
     getDisplay()->setColor(m_currentColor.getCRGB());
+    onColorChange(m_currentColor.getCRGB());
 }
 
 void BaseController::setText(const std::string& text)

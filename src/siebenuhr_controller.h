@@ -41,6 +41,8 @@ protected:
     virtual bool handleLongPressReset() { return false; };
     virtual bool sendBrightnessToHomeAssistant(int brightness) { return false; };
     virtual bool sendColorToHomeAssistant(CRGB color) { return false; };
+    virtual void onBrightnessChange(int brightness)  { };
+    virtual void onColorChange(CRGB color)  { };
 
     // Internal state
     Display* m_display = nullptr;

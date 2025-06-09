@@ -2,9 +2,6 @@
 
 #include "siebenuhr_core.h"
 #include "siebenuhr_display.h"
-#include "siebenuhr_eeprom.h"
-
-// #include "FX/snake.h"
 
 #include "Personalities/FixedColorRenderer.h"
 #include "Personalities/ColorWheelRenderer.h"
@@ -45,7 +42,7 @@ namespace siebenuhr_core
         m_powerEnabled = true;
 
         // set saved configuration
-        setBrightness(Configuration::loadBrightness());
+        setBrightness(constants::DefaultBrightness);
 
         // Initialize notification renderer
         m_notificationRenderer->initialize(m_glyphs, m_numGlyphs);
@@ -147,13 +144,9 @@ namespace siebenuhr_core
         }
     }
 
-    int Display::setBrightness(int value, bool saveToEEPROM) 
+    int Display::setBrightness(int value) 
     {
         value = clamp(value, 0, 255);
-
-        if (saveToEEPROM) {
-            Configuration::saveBrightness(value);
-        }
 
         m_brightness = value;
         FastLED.setBrightness(m_brightness);
@@ -218,7 +211,7 @@ namespace siebenuhr_core
         m_notificationRenderer->activate();
 
         // Set notification display state
-        setBrightness(m_notificationBrightness, false);
+        setBrightness(m_notificationBrightness);
 
         LOG_I("Notification set: %s", text.c_str());
     }
@@ -385,7 +378,7 @@ namespace siebenuhr_core
             if (m_notificationActive) {
                 if (currentMillis - m_notificationStartTime >= m_notificationDuration) {
                     // Notification ended, restore state and brightness
-                    setBrightness(m_notificationPreviousBrightness, false);
+                    setBrightness(m_notificationPreviousBrightness);
                     m_notificationActive = false;
 
                     // activate renderer to set the renderer on each glyph

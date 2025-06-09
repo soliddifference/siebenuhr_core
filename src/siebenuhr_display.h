@@ -32,7 +32,7 @@ namespace siebenuhr_core
 
         void setEnvLightLevel(float lux, int baseBrightness = 10, int maxBrightnessRange = 255);
 
-        int setBrightness(int value, bool saveToEEPROM = true);
+        int setBrightness(int value);
         void setText(const std::string& text);
         void setColor(const CRGB& color, int steps = 0);
         
