@@ -191,7 +191,7 @@ void BaseController::handleUserInput()
                 auto b2_press_time = millis() - m_button2->getLastPressEventTime();
                 if (b1_press_time > RESET_HOLD_DURATION && b2_press_time > RESET_HOLD_DURATION) 
                 {
-                    handleLongPressReset();
+                    onButtonLongPress();
                 }
                 return;
             }

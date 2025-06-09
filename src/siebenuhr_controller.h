@@ -38,9 +38,9 @@ public:
 
 protected:
     // Virtual methods to be implemented by derived classes
-    virtual bool handleLongPressReset() { return false; };
     virtual bool sendBrightnessToHomeAssistant(int brightness) { return false; };
     virtual bool sendColorToHomeAssistant(CRGB color) { return false; };
+    virtual void onButtonLongPress() { };
     virtual void onBrightnessChange(int brightness)  { };
     virtual void onColorChange(CRGB color)  { };
 
