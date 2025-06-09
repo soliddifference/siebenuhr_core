@@ -50,6 +50,7 @@ namespace siebenuhr_core
         constexpr int NotificationBrightness = 255;
 
         // colors
+        constexpr CRGB DEFAULT_COLOR = CRGB(0, 255, 217);
         constexpr CRGB WHITE = CRGB(255, 255, 255);
         constexpr CRGB BLACK = CRGB(0, 0, 0);
 
