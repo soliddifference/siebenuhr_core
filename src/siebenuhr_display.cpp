@@ -238,7 +238,7 @@ namespace siebenuhr_core
         snprintf(formatted_time, sizeof(formatted_time), "%02d%02d", hours, minutes);
         setText(std::string(formatted_time));
 
-        LOG_I("Time set: %02d:%02d", hours, minutes); 
+        // LOG_I("Time set: %02d:%02d", hours, minutes); 
     }    
 
     void Display::getTime(int& hours, int& minutes)

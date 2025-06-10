@@ -107,12 +107,12 @@ void BaseController::handleUserInput()
         {
             switch (m_menuCurPos) {			
             case CONTROLLER_MENU::BRIGHTNESS: {
-                    getDisplay()->setNotification(" huE", 1500);
+                    getDisplay()->setNotification(" huE", 1000);
                     setMenu(CONTROLLER_MENU::HUE);
                     break;
                 }
             case CONTROLLER_MENU::HUE: {
-                    getDisplay()->setNotification("brit", 1500);
+                    getDisplay()->setNotification("brit", 1000);
                     setMenu(CONTROLLER_MENU::BRIGHTNESS);
                     break;
                 }
@@ -277,6 +277,13 @@ void BaseController::handleManualHueChange()
 {
     bool delayOnLongPress = false;
 
+    if (m_display->getCurrentPersonality() != PersonalityType::PERSONALITY_SOLIDCOLOR)
+    {
+        // selecting a color switches the personality to solidcolor
+        setPersonality(PersonalityType::PERSONALITY_SOLIDCOLOR);
+        onPersonalityChange(PersonalityType::PERSONALITY_SOLIDCOLOR);
+    }
+
     if (m_clockType == ClockType::CLOCK_TYPE_REGULAR)
     {
         float hue = (float)(m_encoder->getPosition() % 360);
@@ -423,7 +430,8 @@ void BaseController::setPersonality(PersonalityType personality)
 
 void BaseController::readAndPrintPowerMonitoring()
 {
-    if (millis() - m_lastSensorReadTime >= constants::SensorReadInterval) {
+    if (millis() - m_lastSensorReadTime >= constants::SensorReadInterval) 
+    {
         float busvoltage = g_ina219.getBusVoltage_V();
         float shuntvoltage = g_ina219.getShuntVoltage_mV();  // in mV
         float current_mA = shuntvoltage * 100.0;           // for 10 mΩ shunt

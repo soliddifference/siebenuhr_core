@@ -43,6 +43,8 @@ protected:
     virtual void onButtonLongPress() { };
     virtual void onBrightnessChange(int brightness)  { };
     virtual void onColorChange(CRGB color)  { };
+    virtual void onPersonalityChange(PersonalityType personality) { };
+
 
     // Internal state
     Display* m_display = nullptr;
