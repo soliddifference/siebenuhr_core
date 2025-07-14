@@ -144,14 +144,21 @@ namespace siebenuhr_core
         }
     }
 
+    int remap_brightness(int value, float max)
+    {
+        return (int)(((float)value / max) * 180.f);
+    }
+
     int Display::setBrightness(int value) 
     {
         value = clamp(value, 0, 255);
 
         m_brightness = value;
-        FastLED.setBrightness(m_brightness);
 
-        LOG_D("Display Brightness: %d", m_brightness);
+        int m_value = remap_brightness(m_brightness, 255.f);
+        FastLED.setBrightness(m_value);
+
+        LOG_D("Display Brightness: %d (%d)", m_brightness, m_value);
         return m_brightness;
     }
 
@@ -211,7 +218,7 @@ namespace siebenuhr_core
         m_notificationRenderer->activate();
 
         // Set notification display state
-        setBrightness(m_notificationBrightness);
+        // setBrightness(m_notificationBrightness);
 
         LOG_I("Notification set: %s", text.c_str());
     }

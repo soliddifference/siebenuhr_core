@@ -344,6 +344,8 @@ void BaseController::setPower(bool powerEnabled)
     LOG_D("Power set to %s", powerEnabled ? "ON" : "OFF");
 }
 
+// extern int remap_brightness(int value, float max, float _max);
+
 void BaseController::setBrightness(int value)
 {
     if (m_autoBrightnessEnabled)
@@ -370,6 +372,7 @@ void BaseController::setBrightness(int value)
                 m_encoder->setPosition(m_currentBrightness);
             }
 
+            // int m_value = remap_brightness(value, 255.f, 180.f);
             LOG_I("Brightness set to %d", value);
         }
     }

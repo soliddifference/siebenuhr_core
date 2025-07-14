@@ -43,7 +43,8 @@ namespace siebenuhr_core
         constexpr int MiniLedsPerSegment = 4;
 
         // REGULAR CLOCK
-        constexpr int RegularLedsPerSegment = 11;
+        constexpr int RegularLedsPerSegment = 17;
+        // constexpr int RegularLedsPerSegment = 11;
 
         // notification
         constexpr CRGB NotificationColor = CRGB(0, 255, 217);
