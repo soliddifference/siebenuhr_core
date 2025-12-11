@@ -247,21 +247,21 @@ void BaseController::handleManualBrightnessChange()
     {
         if (m_button1->isLongPress())
         {
-            brightness -= 1;
+            brightness += 1;
         }
         else if (m_button2->isLongPress())
         {
-            brightness += 1;
+            brightness -= 1;
         }
         if (m_button1->getState() == ButtonState::SingleClick || m_button1->getState() == ButtonState::DoubleClick)
         {
-            brightness -= 5;
+            brightness += 5;
         }
         else if (m_button2->getState() == ButtonState::SingleClick || m_button2->getState() == ButtonState::DoubleClick)
         {
-            brightness += 5;
+            brightness -= 5;
         }
-        brightness = clamp(brightness, 1L, 255L);
+        brightness = clamp(brightness, 5L, 255L);
     }
 
     LOG_D("Brightness change: %d", brightness);
