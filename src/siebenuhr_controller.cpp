@@ -321,9 +321,12 @@ void BaseController::handleManualHueChange()
     }
 }
 
-void BaseController::update()
+void BaseController::update(bool doHandleUserInput)
 {
-    handleUserInput();
+    if (doHandleUserInput)
+    {
+        handleUserInput();
+    }
 
     if (m_autoBrightnessEnabled && m_isBH1750Initialized) 
     {

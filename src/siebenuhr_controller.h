@@ -15,7 +15,7 @@ public:
 
     // Core functionality
     virtual void initialize(ClockType type);
-    virtual void update();
+    virtual void update(bool doHandleUserInput = true);
 
     void setLogLevel(int level) {
         Logger::setLogLevel(static_cast<CoreLogLevel>(level));
