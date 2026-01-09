@@ -11,13 +11,12 @@ namespace siebenuhr_core
 {
     namespace constants 
     {
-        // SolidDifference Board GPIO
-        constexpr int LED2_PIN = 22; // next to the BH1750 sensor
-        constexpr int LED3_PIN = 19; // next to the INA219 sensor
-        constexpr int LED4_PIN = 23; // next to user button
-
-        constexpr int LED_HEARTBEAT_PIN = LED2_PIN;
-        constexpr int LED_GLYPH_PIN = 21;
+        // SolidDifference Board GPIO - PWM LEDs
+        constexpr int LED2_PIN = 22;             // PWM LED 2
+        constexpr int LED3_PIN = 19;             // PWM LED 3 - near Boot Button
+        constexpr int LED4_PIN = 23;             // PWM LED 4 - near User Button
+        constexpr int LED_HEARTBEAT_PIN = 5;     // PWM Heartbeat LED (orange)
+        constexpr int LED_GLYPH_PIN = 21;        // FastLED RGB strip
 
         constexpr int USER_BUTTON_PIN = 33;
         constexpr int BOOT_BUTTON_PIN = 0;
@@ -56,7 +55,10 @@ namespace siebenuhr_core
         constexpr CRGB BLACK = CRGB(0, 0, 0);
 
         // sensors
-        constexpr int SensorReadInterval = 2000;
+        #ifndef SENSOR_READ_INTERVAL_MS
+        #define SENSOR_READ_INTERVAL_MS 10000
+        #endif
+        constexpr int SensorReadInterval = SENSOR_READ_INTERVAL_MS;
     }
 
     enum ClockType {
@@ -90,5 +92,19 @@ namespace siebenuhr_core
             return minValue;
         }
         return value;
+    }
+
+    // Brightness: non-linear scaling for better control
+    // available to both PlatformIO and ESPHome versions
+    
+    // Get appropriate step size based on current brightness level
+    // High brightness (>100): coarse steps (10)
+    // Medium brightness (20-100): medium steps (5)  
+    // Low brightness (<20): fine steps (1)
+    inline int getBrightnessStep(int currentBrightness)
+    {
+        if (currentBrightness > 100) return 10;
+        if (currentBrightness > 20) return 5;
+        return 1;
     }
 }

@@ -91,7 +91,6 @@ private:
     void setMenu(CONTROLLER_MENU menu);
     void handleManualBrightnessChange();
     void handleManualHueChange();
-    void readAndPrintPowerMonitoring();
 
     unsigned long m_lastSimultaneousClickTime = 0;
 

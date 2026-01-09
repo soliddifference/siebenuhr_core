@@ -1,0 +1,5 @@
+# Development dependencies for siebenuhr_core
+# Install with: pip install -r requirements.txt
+# Or with uv:   uv pip install -r requirements.txt
+
+platformio>=6.1.0
