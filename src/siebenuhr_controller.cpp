@@ -16,6 +16,7 @@ const BaseController::ControllerMenu_t BaseController::m_menu[BaseController::m_
 void BaseController::initialize(ClockType type)
 {
     Logger::init("🚀 siebenuhr.core");
+    LOG_I("siebenuhr_core v%s", SIEBENUHR_CORE_VERSION);
 
     m_clockType = type;
 

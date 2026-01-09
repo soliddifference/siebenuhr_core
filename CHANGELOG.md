@@ -18,6 +18,39 @@
 - Removed deprecated `readAndPrintPowerMonitoring()` method
 - Fixed logger switch statement missing NONE case
 
-## v1.0.0 (2025)
+## v1.0.10 (Apr - Dec 2025)
 
-- initial release supporting Miniclock and Controller boards, for both ESPHome and PlatformIO
+Feature-complete release with all personalities and controls.
+
+- Added Rainbow, Mosaik, Glitter personalities (Apr-May)
+- Button class with single-click, double-click, long-press support (May)
+- Notification system with overlay rendering (May)
+- Refactored controller and logger (May)
+- High-precision hue manipulation for color accuracy (May)
+- Device reset event detection (May)
+- Accesspoint and render state management (Jun)
+
+## v1.0.5 - v1.0.7 (Apr 2025)
+
+Rapid iteration adding core functionality.
+
+- v1.0.7: Rotary encoder prewiring
+- v1.0.6: Sensor settings (BH1750, INA219)
+- v1.0.5: ColorWheel personality
+
+## v1.0.1 - v1.0.4 (Apr 2025)
+
+Initial versioned releases.
+
+- v1.0.4: ESPHome integration, color/brightness/power control
+- v1.0.1: Auto-brightness support, first version macro
+
+## v1.0.0 (Dec 2024 - Apr 2025)
+
+Initial development and library structure.
+
+- Library scaffolding for PlatformIO and ESPHome
+- Display and Glyph classes
+- ASCII character rendering
+- SolidColor personality
+- Snake test effect

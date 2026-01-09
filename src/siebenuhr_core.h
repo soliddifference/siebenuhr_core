@@ -5,7 +5,7 @@
 
 #include "siebenuhr_logger.h"
 
-#define SIEBENUHR_CORE_VERSION "1.0.10"
+#define SIEBENUHR_CORE_VERSION "1.1.0"
 
 namespace siebenuhr_core
 {
