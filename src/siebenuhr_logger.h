@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdarg>
 #include <Arduino.h>
 #include "esp_log.h"
 
