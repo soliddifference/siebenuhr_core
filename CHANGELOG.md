@@ -3,7 +3,7 @@
 ## v1.1.0 (Jan 2026)
 
 - Brightness scaling: non-linear steps for finer control at low brightness, minimum reduced from 5 to 1
-- Double-click on buttons now cycles through display personalities
+- Double-click personality cycling via `DOUBLE_CLICK_PERSONALITY_ENABLED` build flag (off by default)
 - Sensor reading interval configurable via `SENSOR_READ_INTERVAL_MS` build flag (default 10s)
 - Encoder feedback LED now optional via constructor parameter
 - Added test suites runnable in native (non-hw) environment using mocks

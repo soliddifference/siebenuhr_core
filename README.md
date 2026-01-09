@@ -19,10 +19,10 @@ Dependent projects:
 
 | Function | GPIO | Notes |
 |----------|------|-------|
-| LED 1 (RGB Strip) | 21 | FastLED addressable LEDs (WS2812/SK6812) |
-| LED 2 | 22 | PWM (unused) |
-| LED 3 | 19 | PWM, near Boot Button |
-| LED 4 | 23 | PWM, near User Button |
+| DOUT (RGB Strip) | 21 | FastLED addressable LEDs (WS2812/SK6812) |
+| LED 1 | 22 | PWM  near BH1750, for future calibration use|
+| LED 2 | 19 | PWM, near Boot Button |
+| LED 3 | 23 | PWM, near User Button |
 | Heartbeat LED | 5 | PWM, orange, blinks every 1s |
 | User Button | 33 | |
 | Boot Button | 0 | |
@@ -126,14 +126,16 @@ The core library uses these compile-time flags (set in `platformio.ini`):
 
 ```ini
 build_flags = 
-    -D SENSOR_READ_INTERVAL_MS=10000  ; Sensor polling interval in ms (default: 10000)
-    -D FASTLED_DITHER_ENABLED=1       ; Enable FastLED temporal dithering (off by default)
+    -D SENSOR_READ_INTERVAL_MS=10000    ; Sensor polling interval in ms (default: 10000)
+    -D FASTLED_DITHER_ENABLED=1         ; Enable FastLED temporal dithering (off by default)
+    -D DOUBLE_CLICK_PERSONALITY_ENABLED ; Enable double-click to cycle personalities
 ```
 
 | Flag | Default | Description |
 |------|---------|-------------|
 | `SENSOR_READ_INTERVAL_MS` | 10000 | How often to read I2C sensors (BH1750, INA219) |
 | `FASTLED_DITHER_ENABLED` | off | Enable temporal dithering (can cause flicker at low brightness) |
+| `DOUBLE_CLICK_PERSONALITY_ENABLED` | off | Double-click buttons to cycle display personalities |
 
 ### Runtime Configuration
 

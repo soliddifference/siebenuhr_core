@@ -48,7 +48,7 @@ namespace siebenuhr_core {
     public:
         // Timing constants
         static constexpr unsigned long DEBOUNCE_DELAY = 50;    // ms
-        static constexpr unsigned long DOUBLE_CLICK_TIME = 350;  // ms
+        static constexpr unsigned long DOUBLE_CLICK_TIME = 250;  // ms - intentional double-clicks only
         static constexpr unsigned long LONG_PRESS_THRESHOLD = 500;  // ms
     };
 

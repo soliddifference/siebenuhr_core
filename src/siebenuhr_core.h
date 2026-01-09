@@ -11,12 +11,12 @@ namespace siebenuhr_core
 {
     namespace constants 
     {
-        // SolidDifference Board GPIO - PWM LEDs
-        constexpr int LED2_PIN = 22;             // PWM LED 2
-        constexpr int LED3_PIN = 19;             // PWM LED 3 - near Boot Button
-        constexpr int LED4_PIN = 23;             // PWM LED 4 - near User Button
-        constexpr int LED_HEARTBEAT_PIN = 5;     // PWM Heartbeat LED (orange)
-        constexpr int LED_GLYPH_PIN = 21;        // FastLED RGB strip
+        // SolidDifference Board GPIO - PWM LEDs (names match board silk screen)
+        constexpr int LED1_PIN = 22;             // LED 1 - near BH1750 (calibration)
+        constexpr int LED2_PIN = 19;             // LED 2 - near Boot Button (decrement)
+        constexpr int LED3_PIN = 23;             // LED 3 - near User Button (increment)
+        constexpr int LED_HEARTBEAT_PIN = 5;     // Heartbeat LED (orange)
+        constexpr int LED_GLYPH_PIN = 21;        // DOUT - FastLED RGB strip
 
         constexpr int USER_BUTTON_PIN = 33;
         constexpr int BOOT_BUTTON_PIN = 0;

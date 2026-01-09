@@ -57,11 +57,14 @@ void BaseController::initialize(ClockType type)
 
 void BaseController::initializeControls()
 {
+    // Encoder: no feedback LED by default (only Controller PCB has nearby LED)
+    // Pass constants::LED3_PIN if encoder LED feedback is desired on Controller PCB
     m_encoder = new UIKnob(constants::ROT_ENC_A_PIN, constants::ROT_ENC_B_PIN, constants::ROT_ENC_BUTTON_PIN);
     m_encoder->setEncoderBoundaries(1, 255, 128, false);
 
-    m_button1 = new UIButton(constants::USER_BUTTON_PIN, constants::LED4_PIN);
-    m_button2 = new UIButton(constants::BOOT_BUTTON_PIN, constants::LED3_PIN);
+    // Button1 (User) = increment/up, Button2 (Boot) = decrement/down
+    m_button1 = new UIButton(constants::USER_BUTTON_PIN, constants::LED3_PIN);  // LED 3 near User Button
+    m_button2 = new UIButton(constants::BOOT_BUTTON_PIN, constants::LED2_PIN);  // LED 2 near Boot Button
 }
 
 Display* BaseController::getDisplay()
@@ -186,6 +189,7 @@ void BaseController::handleUserInput()
                 }
             }
 
+            #ifdef DOUBLE_CLICK_PERSONALITY_ENABLED
             // change personality on double click - handle FIRST to avoid triggering hue/brightness
             if (button1_state == ButtonState::DoubleClick) 
             {
@@ -197,6 +201,7 @@ void BaseController::handleUserInput()
                 getDisplay()->selectAdjacentPersonality(1);
                 return;
             }
+            #endif
 
             if (m_button1->isLongPress() && m_button2->isLongPress())
             {
