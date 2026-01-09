@@ -54,9 +54,20 @@ namespace siebenuhr_core
     void Display::setHeartbeatEnabled(bool isEnabled) 
     {
         m_heartbeatEnabled = isEnabled;
+        
+        // Always configure pin as output to ensure known state
+        pinMode(constants::LED_HEARTBEAT_PIN, OUTPUT);
+        
         if (m_heartbeatEnabled)
         {
-            pinMode(constants::LED_HEARTBEAT_PIN, OUTPUT);
+            m_heartbeatState = false;
+            m_lastHeartbeatTime = millis();
+            analogWrite(constants::LED_HEARTBEAT_PIN, 0);
+        }
+        else
+        {
+            // Turn off LED when heartbeat is disabled
+            analogWrite(constants::LED_HEARTBEAT_PIN, 0);
         }
     }
 
@@ -87,6 +98,11 @@ namespace siebenuhr_core
         }
 
 		FastLED.addLeds<WS2812, constants::LED_GLYPH_PIN, GRB>(m_LEDs, m_numLEDs);      
+        #ifdef FASTLED_DITHER_ENABLED
+        FastLED.setDither(1);  // Enable temporal dithering (may flicker at low brightness)
+        #else
+        FastLED.setDither(0);  // Disable dithering by default for stable low-brightness display
+        #endif
         FastLED.clear(true);
 
         m_lastUpdateMillis = millis();
@@ -129,36 +145,30 @@ namespace siebenuhr_core
         return brightness;
     }
 
-    // void Display::setEnvLightLevel(float currentLux, int minBrightness, int maxBrightness)
     void Display::setEnvLightLevel(float currentLux, int baseBrightness, int maxBrightnessRange)
     {
         if (m_powerEnabled) 
         {
-            uint8_t brightness = getSmoothedBrightnessFromLux(currentLux, maxBrightnessRange);
+            uint8_t envBrightness = getSmoothedBrightnessFromLux(currentLux, maxBrightnessRange);
+            int new_brightness = clamp(baseBrightness + (int)envBrightness, 1, 255);
 
-            int new_brightness = clamp(baseBrightness + brightness, 0, 255);
-
+            // FastLED handles gamma internally - pass value directly
             FastLED.setBrightness(new_brightness);
-
-            // logMessage(LOG_LEVEL_INFO, "Base: %d Smoothed: %d Brightness: %d", baseBrightness, brightness, new_brightness);
+            FastLED.show();
         }
-    }
-
-    int remap_brightness(int value, float max)
-    {
-        return (int)(((float)value / max) * 180.f);
     }
 
     int Display::setBrightness(int value) 
     {
-        value = clamp(value, 0, 255);
-
+        value = clamp(value, 1, 255);  // Min 1 for dimmest setting
         m_brightness = value;
 
-        int m_value = remap_brightness(m_brightness, 255.f);
-        FastLED.setBrightness(m_value);
+        // FastLED handles gamma correction and temporal dithering internally
+        // Just pass the value directly - no additional scaling needed
+        FastLED.setBrightness(m_brightness);
+        FastLED.show();  // Apply immediately for responsive feel
 
-        LOG_D("Display Brightness: %d (%d)", m_brightness, m_value);
+        LOG_D("Display Brightness: %d", m_brightness);
         return m_brightness;
     }
 
@@ -406,15 +416,22 @@ namespace siebenuhr_core
             FastLED.show();
         }
 
-        // update heartbeat led
+        // update heartbeat led (dim PWM blink)
         if (m_heartbeatEnabled && (currentMillis - m_lastHeartbeatTime >= m_heartbeatInterval)) {
             m_lastHeartbeatTime = currentMillis;
             m_heartbeatState = !m_heartbeatState;
-            digitalWrite(constants::LED_HEARTBEAT_PIN, m_heartbeatState);
+            analogWrite(constants::LED_HEARTBEAT_PIN, m_heartbeatState ? 25 : 0);  // ~10% brightness
         }
 
         m_avgComputionTime.addValue(currentMillis - m_lastUpdateMillis);
         m_lastUpdateMillis = currentMillis;
+
+        // Log FPS periodically (every 5 seconds) - verbose only
+        static unsigned long lastFpsLogTime = 0;
+        if (currentMillis - lastFpsLogTime >= 5000) {
+            lastFpsLogTime = currentMillis;
+            LOG_V("FastLED FPS: %d, avg frame time: %.1fms", FastLED.getFPS(), m_avgComputionTime.getAverage());
+        }
     }
 
 }

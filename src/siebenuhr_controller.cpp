@@ -16,6 +16,7 @@ const BaseController::ControllerMenu_t BaseController::m_menu[BaseController::m_
 void BaseController::initialize(ClockType type)
 {
     Logger::init("🚀 siebenuhr.core");
+    LOG_I("siebenuhr_core v%s", SIEBENUHR_CORE_VERSION);
 
     m_clockType = type;
 
@@ -23,7 +24,7 @@ void BaseController::initialize(ClockType type)
     if (m_display != nullptr)
     {
         m_display->initialize(type, 4);
-        m_display->setHeartbeatEnabled(false);
+        m_display->setHeartbeatEnabled(true);
 
         m_currentColor = Color::fromCRGB(m_display->getColor());
 
@@ -56,11 +57,14 @@ void BaseController::initialize(ClockType type)
 
 void BaseController::initializeControls()
 {
+    // Encoder: no feedback LED by default (only Controller PCB has nearby LED)
+    // Pass constants::LED3_PIN if encoder LED feedback is desired on Controller PCB
     m_encoder = new UIKnob(constants::ROT_ENC_A_PIN, constants::ROT_ENC_B_PIN, constants::ROT_ENC_BUTTON_PIN);
     m_encoder->setEncoderBoundaries(1, 255, 128, false);
 
-    m_button1 = new UIButton(constants::USER_BUTTON_PIN, constants::LED4_PIN);
-    m_button2 = new UIButton(constants::BOOT_BUTTON_PIN, constants::LED3_PIN);
+    // Button1 (User) = increment/up, Button2 (Boot) = decrement/down
+    m_button1 = new UIButton(constants::USER_BUTTON_PIN, constants::LED3_PIN);  // LED 3 near User Button
+    m_button2 = new UIButton(constants::BOOT_BUTTON_PIN, constants::LED2_PIN);  // LED 2 near Boot Button
 }
 
 Display* BaseController::getDisplay()
@@ -82,7 +86,7 @@ void BaseController::setMenu(CONTROLLER_MENU menu)
     case CONTROLLER_MENU::BRIGHTNESS:
     {
         int current_brightness = getDisplay()->getBrightness();
-        m_encoder->setEncoderBoundaries(1, 255, current_brightness);
+        m_encoder->setEncoderBoundaries(1, 255, current_brightness);  // Min 1 for lowest brightness
         LOG_I("Switch to Option: %s, value=%d", m_menu[static_cast<int>(m_menuCurPos)].name.c_str(), current_brightness);
         break;
     }
@@ -185,6 +189,20 @@ void BaseController::handleUserInput()
                 }
             }
 
+            #ifdef DOUBLE_CLICK_PERSONALITY_ENABLED
+            // change personality on double click - handle FIRST to avoid triggering hue/brightness
+            if (button1_state == ButtonState::DoubleClick) 
+            {
+                getDisplay()->selectAdjacentPersonality(-1);
+                return;
+            }
+            else if (button2_state == ButtonState::DoubleClick) 
+            {
+                getDisplay()->selectAdjacentPersonality(1);
+                return;
+            }
+            #endif
+
             if (m_button1->isLongPress() && m_button2->isLongPress())
             {
                 auto b1_press_time = millis() - m_button1->getLastPressEventTime();
@@ -220,17 +238,7 @@ void BaseController::handleUserInput()
                         setColor(m_currentColor);
                     }
                 }
-            }                  
-
-            // // change personality on double click
-            // else if (button1_state == ButtonState::DoubleClick) 
-            // {
-            //     getDisplay()->selectAdjacentPersonality(-1);
-            // }
-            // else if (button2_state == ButtonState::DoubleClick) 
-            // {
-            //     getDisplay()->selectAdjacentPersonality(1);
-            // }
+            }
         }
     }
 }
@@ -245,26 +253,29 @@ void BaseController::handleManualBrightnessChange()
     }
     else
     {
+        // Use non-linear step size based on current brightness
+        int step = getBrightnessStep(m_currentBrightness);
+        
         if (m_button1->isLongPress())
         {
-            brightness += 1;
+            brightness += 1;  // Fine control during long press
         }
         else if (m_button2->isLongPress())
         {
             brightness -= 1;
         }
-        if (m_button1->getState() == ButtonState::SingleClick || m_button1->getState() == ButtonState::DoubleClick)
+        else if (m_button1->getState() == ButtonState::SingleClick)
         {
-            brightness += 5;
+            brightness += step;
         }
-        else if (m_button2->getState() == ButtonState::SingleClick || m_button2->getState() == ButtonState::DoubleClick)
+        else if (m_button2->getState() == ButtonState::SingleClick)
         {
-            brightness -= 5;
+            brightness -= step;
         }
-        brightness = clamp(brightness, 5L, 255L);
+        brightness = clamp(brightness, 1L, 255L);  // Allow down to 1
     }
 
-    LOG_D("Brightness change: %d", brightness);
+    LOG_D("Brightness change: %d (step: %d)", brightness, getBrightnessStep(m_currentBrightness));
 
     // send state change back to home assistant server
     if (!sendBrightnessToHomeAssistant(brightness))
@@ -328,14 +339,30 @@ void BaseController::update(bool doHandleUserInput)
         handleUserInput();
     }
 
-    if (m_autoBrightnessEnabled && m_isBH1750Initialized) 
+    // Read sensors at regular intervals (avoid I2C polling every frame)
+    if (millis() - m_lastSensorReadTime >= constants::SensorReadInterval) 
     {
-        getDisplay()->setEnvLightLevel(g_bh1750.readLightLevel(), m_currentBrightness, 100);
-    }
+        m_lastSensorReadTime = millis();
 
-    if (m_powerMonitoringEnabled && m_isINA219Initialized)
-    {
-        readAndPrintPowerMonitoring();
+        if (m_isBH1750Initialized) 
+        {
+            float lux = g_bh1750.readLightLevel();
+            if (m_autoBrightnessEnabled) 
+            {
+                getDisplay()->setEnvLightLevel(lux, m_currentBrightness, 100);
+                LOG_D("BH1750: %.1f lux (base brightness: %d)", lux, m_currentBrightness);
+            }
+        }
+
+        if (m_powerMonitoringEnabled && m_isINA219Initialized)
+        {
+            float busvoltage = g_ina219.getBusVoltage_V();
+            float shuntvoltage = g_ina219.getShuntVoltage_mV();
+            float current_mA = shuntvoltage * 100.0;
+            float loadvoltage = busvoltage + (shuntvoltage / 1000.0);
+            float power_mW = busvoltage * current_mA;
+            LOG_D("INA219: %.2fV | %.2fmA | %.2fmW", loadvoltage, current_mA, power_mW);
+        }
     }
 
     getDisplay()->update();
@@ -346,8 +373,6 @@ void BaseController::setPower(bool powerEnabled)
     getDisplay()->setPowerEnabled(powerEnabled);
     LOG_D("Power set to %s", powerEnabled ? "ON" : "OFF");
 }
-
-// extern int remap_brightness(int value, float max, float _max);
 
 void BaseController::setBrightness(int value)
 {
@@ -375,7 +400,6 @@ void BaseController::setBrightness(int value)
                 m_encoder->setPosition(m_currentBrightness);
             }
 
-            // int m_value = remap_brightness(value, 255.f, 180.f);
             LOG_I("Brightness set to %d", value);
         }
     }
@@ -431,33 +455,6 @@ void BaseController::setPersonality(PersonalityType personality)
     if (m_display != nullptr)
     {
         m_display->setPersonality(personality);
-    }
-}
-
-void BaseController::readAndPrintPowerMonitoring()
-{
-    if (millis() - m_lastSensorReadTime >= constants::SensorReadInterval) 
-    {
-        float busvoltage = g_ina219.getBusVoltage_V();
-        float shuntvoltage = g_ina219.getShuntVoltage_mV();  // in mV
-        float current_mA = shuntvoltage * 100.0;           // for 10 mΩ shunt
-        float loadvoltage = busvoltage + (shuntvoltage / 1000.0); // in V
-        float power_mW = busvoltage * current_mA;          // V * mA = mW
-
-        bool current_in_A = abs(current_mA) >= 500.0;
-        bool power_in_W = abs(power_mW) >= 500.0;
-
-        LOG_I("Bus: %.2fV | Shunt: %.2fmV | Load: %.2fV | Current: %.2f%s | Power: %.2f%s", 
-            busvoltage, 
-            shuntvoltage, 
-            loadvoltage, 
-            current_in_A?(current_mA / 1000.0):current_mA, 
-            current_in_A?"A":"mA",
-            power_in_W?(power_mW / 1000.0):power_mW,
-            power_in_W?"W":"mW"
-        );
-        
-        m_lastSensorReadTime = millis();
     }
 }
 

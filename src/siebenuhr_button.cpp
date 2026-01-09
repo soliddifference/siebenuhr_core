@@ -30,7 +30,8 @@ namespace siebenuhr_core
         m_buttonPin = buttonPin;
         m_ledPin = ledPin;
 
-        // pinMode(m_ledPin, OUTPUT);
+        pinMode(m_ledPin, OUTPUT);
+        digitalWrite(m_ledPin, LOW);
         pinMode(m_buttonPin, INPUT_PULLUP);
         m_lastTransition = millis();
     }
@@ -98,7 +99,7 @@ namespace siebenuhr_core
         }
 
         m_lastState = reading;
-        // digitalWrite(m_ledPin, (m_state == LOW) ? HIGH : LOW);
+        digitalWrite(m_ledPin, (m_state == LOW) ? HIGH : LOW);
 
         return m_buttonState;
     }

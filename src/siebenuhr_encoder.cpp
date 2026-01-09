@@ -15,13 +15,21 @@ namespace siebenuhr_core
         m_rotaryEncoder->readButton_ISR();
     }
 
-    UIKnob::UIKnob(uint8_t encoderPinA, uint8_t encoderPinB, uint8_t buttonPin) 
+    UIKnob::UIKnob(uint8_t encoderPinA, uint8_t encoderPinB, uint8_t buttonPin, int8_t feedbackLedPin) 
+        : m_feedbackLedPin(feedbackLedPin)
     {
         m_rotaryEncoder = new AiEsp32RotaryEncoder(encoderPinA, encoderPinB, buttonPin, -1, ROTARY_ENCODER_STEPS);
         m_rotaryEncoder->begin();
         m_rotaryEncoder->setup(handleEncoderInterrupt, handleButtonInterrupt);
         m_rotaryEncoder->setBoundaries(0, 255, false); //minValue, maxValue, circleValues true|false (when max go to min and vice versa)
         m_rotaryEncoder->setAcceleration(250);
+
+        // Initialize LED pin for encoder button feedback (if configured)
+        if (m_feedbackLedPin >= 0) 
+        {
+            pinMode(m_feedbackLedPin, OUTPUT);
+            digitalWrite(m_feedbackLedPin, LOW);
+        }
 
         m_encoderPosition = 0;
         m_encoderPositionDiff = 0;
@@ -39,13 +47,17 @@ namespace siebenuhr_core
         m_buttonPressedState = m_rotaryEncoder->isEncoderButtonDown();
 
         if (isButtonPressed()) {
-            digitalWrite(constants::LED2_PIN, HIGH);
+            if (m_feedbackLedPin >= 0) {
+                digitalWrite(m_feedbackLedPin, HIGH);
+            }
             if (!m_buttonPrevPressedState) {
                 m_buttonPrevPressedState = true;
                 m_buttonPressedTime = millis();
             }
         } else {
-            digitalWrite(constants::LED2_PIN, LOW);
+            if (m_feedbackLedPin >= 0) {
+                digitalWrite(m_feedbackLedPin, LOW);
+            }
             m_buttonPrevPressedState = false;
         }	
     }

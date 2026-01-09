@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdarg>
 #include <Arduino.h>
 #include "esp_log.h"
 
@@ -52,8 +53,11 @@ public:
     static void setLogLevel(CoreLogLevel level) {
         s_log_level = level;
 
-        String levelName = "NONE";
+        String levelName;
         switch (level) {
+            case CoreLogLevel::NONE:
+                levelName = "NONE";
+                break;
             case CoreLogLevel::ERROR:
                 levelName = "ERROR";
                 break;
